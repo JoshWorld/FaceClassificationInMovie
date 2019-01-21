@@ -52,7 +52,10 @@ with detection_graph.as_default():
 
 
 # Loading label map
-# Label maps map indices to category names, so that when our convolution network predicts `5`, we know that this corresponds to `airplane`.  Here we use internal utility functions, but anything that returns a dictionary mapping integers to appropriate string labels would be fine
+# Label maps map indices to category names, so that when our convolution network predicts `5`,
+# we know that this corresponds to `airplane`.
+# Here we use internal utility functions, but anything that returns a dictionary
+# mapping integers to appropriate string labels would be fine
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 print(label_map)
 categories = label_map_util.convert_label_map_to_categories(
@@ -60,6 +63,7 @@ categories = label_map_util.convert_label_map_to_categories(
 category_index = label_map_util.create_category_index(categories)
 
 print(category_index)
+
 
 # Helper code
 def load_image_into_numpy_array(image):
@@ -88,10 +92,31 @@ with detection_graph.as_default():
             # Extract number of detectionsd
             num_detections = detection_graph.get_tensor_by_name(
                 'num_detections:0')
+
             # Actual detection.
             (boxes, scores, classes, num_detections) = sess.run(
                 [boxes, scores, classes, num_detections],
                 feed_dict={image_tensor: image_np_expanded})
+
+            for score_val, box_val, class_val in zip(np.squeeze(scores), np.squeeze(boxes), np.squeeze(classes)):
+                if score_val > 0.8 and class_val == 1:  # score > 0.9 and person
+                    w = image_np.shape[0]
+                    h = image_np.shape[1]
+
+                    w_min = int(w*box_val[0])
+                    w_max = int(w*box_val[2])
+
+                    h_min = int(h*box_val[1])
+                    h_max = int(h*box_val[3])
+
+                    cv2.rectangle(image_np, (w_min, h_max), (w_max, h_min), (0, 0, 255), 2)
+                    cv2.imshow('object detection', cv2.resize(image_np, (800, 600)))
+                    cv2.waitKey(0)
+
+                    #print('w', image_np.shape[1] * box_val[1])
+
+                    print(score_val,box_val, class_val)
+
 
             # Visualization of the results of a detection.
             vis_util.visualize_boxes_and_labels_on_image_array(
