@@ -100,34 +100,31 @@ with detection_graph.as_default():
 
             for score_val, box_val, class_val in zip(np.squeeze(scores), np.squeeze(boxes), np.squeeze(classes)):
                 if score_val > 0.8 and class_val == 1:  # score > 0.9 and person
-                    w = image_np.shape[0]
-                    h = image_np.shape[1]
+                    h = image_np.shape[0]
+                    w = image_np.shape[1]
 
-                    w_min = int(w*box_val[0])
-                    w_max = int(w*box_val[2])
+                    y_min = int(h*box_val[0])
+                    x_min = int(w* box_val[1])
 
-                    h_min = int(h*box_val[1])
-                    h_max = int(h*box_val[3])
+                    y_max = int(h*box_val[2])
+                    x_max = int(w*box_val[3])
 
-                    cv2.rectangle(image_np, (w_min, h_max), (w_max, h_min), (0, 0, 255), 2)
-                    cv2.imshow('object detection', cv2.resize(image_np, (800, 600)))
+                    cv2.rectangle(image_np, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
+                    cv2.imshow('t',image_np[y_min:y_max,x_min:x_max])
                     cv2.waitKey(0)
-
-                    #print('w', image_np.shape[1] * box_val[1])
-
                     print(score_val,box_val, class_val)
 
 
             # Visualization of the results of a detection.
-            vis_util.visualize_boxes_and_labels_on_image_array(
-                image_np,
-                np.squeeze(boxes),
-                np.squeeze(classes).astype(np.int32),
-                np.squeeze(scores),
-                category_index,
-                use_normalized_coordinates=True,
-                line_thickness=6,
-                min_score_thresh=0.8)
+            # vis_util.visualize_boxes_and_labels_on_image_array(
+            #     image_np,
+            #     np.squeeze(boxes),
+            #     np.squeeze(classes).astype(np.int32),
+            #     np.squeeze(scores),
+            #     category_index,
+            #     use_normalized_coordinates=True,
+            #     line_thickness=6,
+            #     min_score_thresh=0.8)
 
             # Display output
             cv2.imshow('object detection', cv2.resize(image_np, (800, 600)))
