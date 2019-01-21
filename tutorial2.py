@@ -72,6 +72,7 @@ def load_image_into_numpy_array(image):
         (im_height, im_width, 3)).astype(np.uint8)
 
 
+c = 0
 # Detection
 with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
@@ -109,10 +110,14 @@ with detection_graph.as_default():
                     y_max = int(h*box_val[2])
                     x_max = int(w*box_val[3])
 
-                    cv2.rectangle(image_np, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
-                    cv2.imshow('t',image_np[y_min:y_max,x_min:x_max])
-                    cv2.waitKey(0)
-                    print(score_val,box_val, class_val)
+                    #cv2.rectangle(image_np, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
+                    crop_img = image_np.copy()[y_min:y_max,x_min:x_max]
+                    cv2.imwrite("sample/frame%d.jpg" % c,crop_img)
+                    c = c + 1
+
+                    #cv2.imshow('t',image_np[y_min:y_max,x_min:x_max])
+                    #cv2.waitKey(0)
+                    #print(score_val,box_val, class_val)
 
 
             # Visualization of the results of a detection.
