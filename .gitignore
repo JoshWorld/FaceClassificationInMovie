@@ -1,0 +1,8 @@
+data
+.idea
+models
+ssd_inception_v2_coco_2017_11_17
+ssd_mobilenet_v1_coco_11_06_2017
+ssd_mobilenet_v1_coco_2017_11_17
+ssd_inception_v2_coco_2017_11_17.tar.gz
+faster_rcnn_inception_v2_coco_2018_01_28
