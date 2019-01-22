@@ -4,6 +4,54 @@ import os
 from random import shuffle
 
 
+# image and label load func for cnn
+def load_image(lee_path, hwang_path):
+    # features load
+    feature_data = []
+    label_data = []
+    path = os.listdir(lee_path)
+    for filename in path:
+        full_filename = os.path.join(lee_path, filename)
+        img = cv2.imread(full_filename)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (80, 80), interpolation=cv2.INTER_CUBIC)
+        img = img.astype(np.float32)
+        img = (img - np.mean(img)) / np.std(img)
+        feature_data.append(img)
+        label_data.append(1)
+
+    path = os.listdir(hwang_path)
+    for filename in path:
+        full_filename = os.path.join(hwang_path, filename)
+        img = cv2.imread(full_filename)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (80, 80), interpolation=cv2.INTER_CUBIC)
+        img = img.astype(np.float32)
+        img = (img - np.mean(img)) / np.std(img)
+        feature_data.append(img)
+        label_data.append(0)
+
+    feature_data = np.array(feature_data)
+    label_data = np.array(label_data)
+
+    # shuffle data
+    c = list(zip(feature_data, label_data))
+    shuffle(c)
+    feature_data, label_data = zip(*c)
+    feature_data = np.array(feature_data)
+    label_data = np.array(label_data)
+
+    # train, test data
+    train_feature_data = feature_data[:int(len(feature_data)*0.8)]
+    train_label_data = label_data[:int(len(label_data)*0.8)]
+    test_feature_data = feature_data[int(len(feature_data) * 0.8):]
+    test_label_data = label_data[int(len(label_data) * 0.8):]
+
+    print(train_label_data)
+
+    return train_feature_data, train_label_data, test_feature_data, test_label_data
+
+
 def image_slicing(image, h, w, p):
     image = image.astype(np.float32)
     slicing_image_list = []

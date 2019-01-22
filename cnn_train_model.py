@@ -12,7 +12,7 @@ IMG_WEIGHT = 80
 
 MODEL_SAVE_DIR = 'model'
 
-x_train, y_train, x_test, y_test = tensor_func.cnn_images_and_labels_load('img_data')  # image load for cnn
+x_train, y_train, x_test, y_test = tensor_func.load_image('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\lee_train_data', 'C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\hwang_train_data')  # image load for cnn
 
 images_batch = tf.placeholder(dtype=tf.float32, shape=[None, IMG_HEIGHT, IMG_WEIGHT, NUM_CHANNEL], name="images_batch")
 labels_batch = tf.placeholder(dtype=tf.int32, shape=[None, ], name="labels_batch")
