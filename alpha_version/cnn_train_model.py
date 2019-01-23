@@ -1,7 +1,6 @@
 import tensorflow as tf
-import tensor_func
+from alpha_version import tensor_func
 import os
-import cv2
 
 BATCH_SIZE = 10
 NUM_CLASS = 2  # output is 0,1
