@@ -1,12 +1,10 @@
-model/
 models/
+labels/
 data/
-ssd_inception_v2_coco_2017_11_17/
 .idea/
-ssd_inception_v2_coco_2017_11_17.tar.gz
 __pycache__/
-alpha_version/frame/
 *.jpg
 *.PNG
 *.JPG
 *.png
+*.gz

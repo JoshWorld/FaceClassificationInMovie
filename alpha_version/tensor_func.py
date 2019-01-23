@@ -34,14 +34,14 @@ def load_image(lee_path, hwang_path):
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
-    # shuffle data
+    # shuffle labels
     c = list(zip(feature_data, label_data))
     shuffle(c)
     feature_data, label_data = zip(*c)
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
-    # train, test data
+    # train, test labels
     train_feature_data = feature_data[:int(len(feature_data)*0.8)]
     train_label_data = label_data[:int(len(label_data)*0.8)]
     test_feature_data = feature_data[int(len(feature_data) * 0.8):]
@@ -86,14 +86,14 @@ def images_and_labels_load(dir_path):
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
-    # shuffle data
+    # shuffle labels
     c = list(zip(feature_data, label_data))
     shuffle(c)
     feature_data, label_data = zip(*c)
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
-    # train, test data
+    # train, test labels
     train_feature_data = feature_data[:int(len(feature_data)*0.8)]
     train_label_data = label_data[:int(len(label_data)*0.8)]
     test_feature_data = feature_data[int(len(feature_data) * 0.8):]
@@ -125,14 +125,14 @@ def cnn_images_and_labels_load(dir_path):
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
-    # shuffle data
+    # shuffle labels
     c = list(zip(feature_data, label_data))
     shuffle(c)
     feature_data, label_data = zip(*c)
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
-    # train, test data
+    # train, test labels
     train_feature_data = feature_data[:int(len(feature_data)*0.8)]
     train_label_data = label_data[:int(len(label_data)*0.8)]
     test_feature_data = feature_data[int(len(feature_data) * 0.8):]

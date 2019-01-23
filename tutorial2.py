@@ -8,19 +8,19 @@ from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 # Define the video stream
-cap = cv2.VideoCapture('C:\\Users\\ADMIN\PycharmProjects\\FaceClassificationInMovie\\test_data\\sinsegae2.mp4')  # Change only if you have more than one webcams
+cap = cv2.VideoCapture('C:\\Users\\ADMIN\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4')  # Change only if you have more than one webcams
 
 # What model to download.
 # Models can bee found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
-MODEL_NAME = 'ssd_inception_v2_coco_2017_11_17'
+MODEL_NAME = 'models'
 MODEL_FILE = MODEL_NAME + '.tar.gz'
 DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
+PATH_TO_CKPT = MODEL_NAME + '/object_detection_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = os.path.join('data', 'mscoco_label_map.pbtxt')
+PATH_TO_LABELS = os.path.join('labels', 'mscoco_label_map.pbtxt')
 
 # Number of classes to detect
 NUM_CLASSES = 1
@@ -31,7 +31,7 @@ opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
 tar_file = tarfile.open(MODEL_FILE)
 for file in tar_file.getmembers():
     file_name = os.path.basename(file.name)
-    if 'frozen_inference_graph.pb' in file_name:
+    if 'object_detection_graph.pb' in file_name:
         tar_file.extract(file, os.getcwd())
 
 

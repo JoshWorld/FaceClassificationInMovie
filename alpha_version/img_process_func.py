@@ -34,4 +34,4 @@ def feature_matching_orb(img1, img2):
 
 
 
-video_to_frame('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_data\\sample2.mp4')
+video_to_frame('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sample2.mp4')
