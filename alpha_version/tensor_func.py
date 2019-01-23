@@ -3,7 +3,6 @@ import numpy as np
 import os
 from random import shuffle
 
-
 # image and label load func for cnn
 def load_image(lee_path, hwang_path):
     # features load
@@ -40,6 +39,7 @@ def load_image(lee_path, hwang_path):
     c = list(zip(feature_data, label_data))
     shuffle(c)
     feature_data, label_data = zip(*c)
+
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
@@ -48,6 +48,8 @@ def load_image(lee_path, hwang_path):
     train_label_data = label_data[:int(len(label_data)*0.8)]
     test_feature_data = feature_data[int(len(feature_data) * 0.8):]
     test_label_data = label_data[int(len(label_data) * 0.8):]
+
+
 
     return train_feature_data, train_label_data, test_feature_data, test_label_data
 
