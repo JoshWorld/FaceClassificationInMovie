@@ -10,6 +10,7 @@ def load_image(lee_path, hwang_path):
     feature_data = []
     label_data = []
     path = os.listdir(lee_path)
+
     for filename in path:
         full_filename = os.path.join(lee_path, filename)
         img = cv2.imread(full_filename)
@@ -34,6 +35,7 @@ def load_image(lee_path, hwang_path):
     feature_data = np.array(feature_data)
     label_data = np.array(label_data)
 
+
     # shuffle labels
     c = list(zip(feature_data, label_data))
     shuffle(c)
@@ -46,8 +48,6 @@ def load_image(lee_path, hwang_path):
     train_label_data = label_data[:int(len(label_data)*0.8)]
     test_feature_data = feature_data[int(len(feature_data) * 0.8):]
     test_label_data = label_data[int(len(label_data) * 0.8):]
-
-    print(train_label_data)
 
     return train_feature_data, train_label_data, test_feature_data, test_label_data
 

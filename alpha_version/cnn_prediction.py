@@ -5,7 +5,6 @@ import numpy as np
 
 # load tensorflow model
 
-tf.device('/cpu:0')
 sess = tf.Session()
 saver = tf.train.import_meta_graph('model/model.ckpt.meta')
 saver.restore(sess, 'model/model.ckpt')
@@ -16,9 +15,11 @@ keep_prob = graph.get_tensor_by_name("keep_prob:0")
 
 class_prediction = graph.get_tensor_by_name('class_prediction:0')
 
-
 # open video
-video = cv2.VideoCapture('video_data/car3_gray.mp4')
+video = cv2.VideoCapture('C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4')
+
+
+
 
 while video.isOpened():
     ret, frame = video.read()
