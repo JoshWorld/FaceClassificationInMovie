@@ -6,3 +6,7 @@ ssd_inception_v2_coco_2017_11_17/
 ssd_inception_v2_coco_2017_11_17.tar.gz
 __pycache__/
 alpha_version/frame/
+*.jpg
+*.PNG
+*.JPG
+*.png

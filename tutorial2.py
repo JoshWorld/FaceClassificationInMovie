@@ -14,7 +14,7 @@ from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 # Define the video stream
-cap = cv2.VideoCapture('C:\\Users\\ADMIN\PycharmProjects\\FaceClassificationInMovie\\test_video\\sample2.mp4')  # Change only if you have more than one webcams
+cap = cv2.VideoCapture('C:\\Users\\ADMIN\PycharmProjects\\FaceClassificationInMovie\\test_data\\sample2.mp4')  # Change only if you have more than one webcams
 
 # What model to download.
 # Models can bee found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
@@ -112,7 +112,7 @@ with detection_graph.as_default():
 
                     #cv2.rectangle(image_np, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
                     crop_img = image_np.copy()[y_min:y_max,x_min:x_max]
-                    cv2.imwrite("new_test_data/frame%d.jpg" % c,crop_img)
+                    cv2.imwrite("alpha_version/frame/frame%d.jpg" % c,crop_img)
                     c = c + 1
 
                     #cv2.imshow('t',image_np[y_min:y_max,x_min:x_max])
