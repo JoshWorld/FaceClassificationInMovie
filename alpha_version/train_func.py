@@ -22,7 +22,7 @@ def set_data(root_dir):
     original_images = []
 
     dir_list = os.listdir(root_dir)
-    print(dir_list[0], dir_list[1])
+
     for cls_index, dir_name in enumerate(dir_list):
         image_dir = os.listdir(root_dir + os.sep + dir_name)
 

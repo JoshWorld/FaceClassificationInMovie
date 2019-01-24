@@ -1,6 +1,6 @@
 import tensorflow as tf
 import cv2
-
+from alpha_version import train_func
 # load tensorflow model
 
 sess = tf.Session()
@@ -13,8 +13,14 @@ keep_prob = graph.get_tensor_by_name("keep_prob:0")
 
 class_prediction = graph.get_tensor_by_name('class_prediction:0')
 
+x_data, y_data, o = train_func.set_data('test_data')
+pred_label = sess.run([class_prediction], feed_dict={images_batch: x_data, keep_prob:1.0})
+print(pred_label, y_data)
 
+for i in o :
+    cv2.imshow('a',i)
+    cv2.waitKey(0)
 
-pred_label = sess.run([class_prediction], feed_dict={images_batch: slicing_img, keep_prob:1.0})
-print(pred_label)
-
+#
+# [1, 1, 1, 1, 1, 0]
+# [1, 0, 1, 1, 1, 0]

@@ -75,7 +75,7 @@ sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
 iter_ = train_func.train_data_iterator(x_train, y_train, BATCH_SIZE)
-for step in range(1000):
+for step in range(100):
     images_batch_val, labels_batch_val = next(iter_)
     accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
                                                                                  labels_batch:labels_batch_val,
@@ -101,7 +101,7 @@ print('Model saved in file : {}'.format(save_path))
 # lee_train = 1
 # choi = 0
 
-for pre_label, image_ in zip(y_test, original_img_list):
-    cv2.imshow(str(pre_label), image_)
-    cv2.waitKey(0)
-
+# for pre_label, image_ in zip(y_test, original_img_list):
+#     cv2.imshow(str(pre_label), image_)
+#     cv2.waitKey(0)
+#
