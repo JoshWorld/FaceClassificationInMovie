@@ -1,9 +1,10 @@
 import tensorflow as tf
 from alpha_version import train_func
 import cv2
+import os
 
-BATCH_SIZE = 10
-NUM_CLASS = 2  # output is 0,1,2
+BATCH_SIZE = 100
+NUM_CLASS = 2  # ouput / 2->0,1 / 4 -> 0,1,2,3
 NUM_CHANNEL = 3  # R G B
 
 IMG_HEIGHT = 80
@@ -11,7 +12,7 @@ IMG_WEIGHT = 80
 
 MODEL_SAVE_DIR = 'model'
 
-x_train, y_train, original_images = train_func.set_data('train_data')  # image load for cnn
+x_train, y_train, original_images = train_func.set_data('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\train_data')  # image load for cnn
 
 images_batch = tf.placeholder(dtype=tf.float32, shape=[None, IMG_HEIGHT, IMG_WEIGHT, NUM_CHANNEL], name="images_batch")
 labels_batch = tf.placeholder(dtype=tf.int32, shape=[None, ], name="labels_batch")
@@ -42,7 +43,7 @@ def dense_layer(input_tensor, input_dim, output_dim, layer_name, act=True):
 
 input_shape = images_batch.get_shape()[1:]
 
-# cnn layer
+# cnn layerd
 conv1 = con_layer(images_batch, 5, input_shape[2], 32, 'con_layer1') # (input_tensor, filter_size, in_channels, out_channels, layer_name)
 h_pool1 = max_pool_2x2(conv1)
 conv2 = con_layer(h_pool1, 5, 32, 64, 'con_layer2')
@@ -69,11 +70,12 @@ loss_mean = tf.reduce_mean(loss)
 train_op = tf.train.AdamOptimizer().minimize(loss_mean)
 
 # For model save
+saver = tf.train.Saver()
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
 iter_ = train_func.train_data_iterator(x_train, y_train, BATCH_SIZE)
-for step in range(100):
+for step in range(1000):
     images_batch_val, labels_batch_val = next(iter_)
     accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
                                                                                  labels_batch:labels_batch_val,
@@ -82,21 +84,24 @@ for step in range(100):
 print('Training Finished....')
 
 
-x_test, y_test, original_img_list = train_func.set_data('test_data')  # image load for cnn
+x_test, y_test, original_img_list = train_func.set_data('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\test_data')  # image load for cnn
 
-loss_val, accuracy_, class_prediction_ = sess.run([loss_mean, accuracy, class_prediction],
+loss_, loss_val, accuracy_, class_prediction_ = sess.run([loss, loss_mean, accuracy, class_prediction],
                                  feed_dict={images_batch: x_test,
                                             labels_batch: y_test,
                                             keep_prob: 1.0})
 
+print(loss_)
 print('ACC = {}, LOSS = {}, pred_label = {}, real_label = {}'.format(accuracy_, loss_val, class_prediction_, y_test))
 
+save_path = saver.save(sess, MODEL_SAVE_DIR + os.sep + 'model.ckpt')
+print('Model saved in file : {}'.format(save_path))
 
 # hwang = 2
-# lee = 1
+# lee_train = 1
 # choi = 0
 
-for pre_label, image_ in zip(class_prediction_, original_img_list):
+for pre_label, image_ in zip(y_test, original_img_list):
     cv2.imshow(str(pre_label), image_)
     cv2.waitKey(0)
 

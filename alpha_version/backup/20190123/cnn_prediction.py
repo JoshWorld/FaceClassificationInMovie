@@ -16,7 +16,7 @@ keep_prob = graph.get_tensor_by_name("keep_prob:0")
 class_prediction = graph.get_tensor_by_name('class_prediction:0')
 
 # open video
-video = cv2.VideoCapture('C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4')
+video = cv2.VideoCapture('C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2_face.mp4')
 
 
 

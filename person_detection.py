@@ -6,7 +6,7 @@ from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 
-cap = cv2.VideoCapture('C:\\Users\\ADMIN\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4')  # Change only if you have more than one webcams
+cap = cv2.VideoCapture('C:\\Users\\ADMIN\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae.mp4')  # Change only if you have more than one webcams
 
 PATH_TO_CKPT = 'models/object_detection_graph.pb'
 PATH_TO_LABELS = 'labels/mscoco_label_map.pbtxt'

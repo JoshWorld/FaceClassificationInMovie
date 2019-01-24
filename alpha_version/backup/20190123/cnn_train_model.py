@@ -96,7 +96,7 @@ print('ACC = {}, LOSS = {}, pred_label = {}, real_label = {}'.format(accuracy_, 
 
 
 # hwang = 2
-# lee = 1
+# lee_train = 1
 # choi = 0
 for label_, image_ in zip(class_prediction_, original_img_list):
     cv2.imshow(str(label_), image_)

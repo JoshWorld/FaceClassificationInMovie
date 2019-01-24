@@ -9,3 +9,6 @@ __pycache__/
 *.png
 *.gz
 model/
+*jpeg
+alpha_version/backup/
+alpha_version/model/

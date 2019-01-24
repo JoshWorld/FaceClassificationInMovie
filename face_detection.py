@@ -17,7 +17,7 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae.mp4")
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4")
 
 detection_graph = tf.Graph()
 
@@ -65,7 +65,7 @@ with detection_graph.as_default():
 
                     #cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
                     crop_img = image.copy()[y_min:y_max, x_min:x_max]
-                    cv2.imwrite('sinsegae_face/frame{}.jpg'.format(c),crop_img)
+                    cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
                     c = c + 1
 
 
