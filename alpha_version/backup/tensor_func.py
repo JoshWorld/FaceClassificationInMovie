@@ -3,55 +3,45 @@ import numpy as np
 import os
 from random import shuffle
 
-# image and label load func for cnn
-def load_image(lee_path, hwang_path):
-    # features load
-    feature_data = []
-    label_data = []
-    path = os.listdir(lee_path)
 
-    for filename in path:
-        full_filename = os.path.join(lee_path, filename)
-        img = cv2.imread(full_filename)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (80, 80), interpolation=cv2.INTER_CUBIC)
-        img = img.astype(np.float32)
-        img = (img - np.mean(img)) / np.std(img)
-        feature_data.append(img)
-        label_data.append(1)
+def load_image(path):
+    img = cv2.imread(path)
+    original_img = img.copy()
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (80, 80), interpolation=cv2.INTER_CUBIC)
+    img = img.astype(np.float32)
+    img = (img - np.mean(img)) / np.std(img)
+    return img, original_img
 
-    path = os.listdir(hwang_path)
-    for filename in path:
-        full_filename = os.path.join(hwang_path, filename)
-        img = cv2.imread(full_filename)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (80, 80), interpolation=cv2.INTER_CUBIC)
-        img = img.astype(np.float32)
-        img = (img - np.mean(img)) / np.std(img)
-        feature_data.append(img)
-        label_data.append(0)
 
-    feature_data = np.array(feature_data)
-    label_data = np.array(label_data)
+# face train function
+def set_data(root_dir):
 
+    features = []
+    labels = []
+    original_images = []
+
+    dir_list = os.listdir(root_dir)
+    for cls_index, dir_name in enumerate(dir_list):
+        image_dir = os.listdir(root_dir + os.sep + dir_name)
+        for image_file in image_dir:
+            image, original_image = load_image(root_dir + os.sep + dir_name + os.sep + image_file)
+            features.append(image)
+            original_images.append(original_image)
+            labels.append(cls_index)
+
+    features = np.array(features)
+    labels = np.array(labels)
 
     # shuffle labels
-    c = list(zip(feature_data, label_data))
+    c = list(zip(features, labels, original_images))
     shuffle(c)
-    feature_data, label_data = zip(*c)
+    features, labels, original_images = zip(*c)
 
-    feature_data = np.array(feature_data)
-    label_data = np.array(label_data)
+    features = np.array(features)
+    labels = np.array(labels)
 
-    # train, test labels
-    train_feature_data = feature_data[:int(len(feature_data)*0.8)]
-    train_label_data = label_data[:int(len(label_data)*0.8)]
-    test_feature_data = feature_data[int(len(feature_data) * 0.8):]
-    test_label_data = label_data[int(len(label_data) * 0.8):]
-
-
-
-    return train_feature_data, train_label_data, test_feature_data, test_label_data
+    return features, labels, original_images
 
 
 def image_slicing(image, h, w, p):

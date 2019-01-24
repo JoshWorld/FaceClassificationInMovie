@@ -1,8 +1,9 @@
 import tensorflow as tf
-from alpha_version import tensor_func
+from alpha_version.backup import tensor_func
+import cv2
 
 BATCH_SIZE = 10
-NUM_CLASS = 2  # output is 0,1
+NUM_CLASS = 3  # output is 0,1,2
 NUM_CHANNEL = 3  # R G B
 
 IMG_HEIGHT = 80
@@ -10,9 +11,7 @@ IMG_WEIGHT = 80
 
 MODEL_SAVE_DIR = 'model'
 
-x_train, y_train, x_test, y_test = tensor_func.load_image('C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\lee_train',
-                                                'C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\hwang_train')
-
+x_train, y_train, original_images = tensor_func.set_data('train_data')  # image load for cnn
 
 images_batch = tf.placeholder(dtype=tf.float32, shape=[None, IMG_HEIGHT, IMG_WEIGHT, NUM_CHANNEL], name="images_batch")
 labels_batch = tf.placeholder(dtype=tf.int32, shape=[None, ], name="labels_batch")
@@ -75,32 +74,31 @@ sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
 iter_ = tensor_func.train_data_iterator(x_train, y_train, BATCH_SIZE)
-for step in range(100):
+for step in range(1000):
     images_batch_val, labels_batch_val = next(iter_)
-    accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],
-                                      feed_dict={
-                                          images_batch:images_batch_val,
-                                          labels_batch:labels_batch_val,
-                                          keep_prob: 0.5
-                                      })
-
+    accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
+                                                                                 labels_batch:labels_batch_val,
+                                                                                 keep_prob: 0.5  })
     print('Iteration {}: ACC={}, LOSS={}'.format(step, accuracy_, loss_val))
-
 print('Training Finished....')
 
-#save_path = saver.save(sess, MODEL_SAVE_DIR + os.sep + 'model.ckpt')
-#print('Model saved in file : {}'.format(save_path))
+# save_path = saver.save(sess, MODEL_SAVE_DIR + os.sep + 'model.ckpt')
+# print('Model saved in file : {}'.format(save_path))
 
 
-x, y, _, _ = tensor_func.load_image('C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\lee_test',
-                                    'C:\\Users\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\hwang_test')
+x_test, y_test, original_img_list = tensor_func.set_data('test_data')  # image load for cnn
+loss_val, accuracy_, class_prediction_, labels_batch_val = sess.run([loss_mean, accuracy, class_prediction, labels_batch],
+                                 feed_dict={images_batch: x_test,
+                                            labels_batch: y_test,
+                                            keep_prob: 1.0})
 
-loss_val, accuracy_, class_prediction_ = sess.run([loss_mean, accuracy, class_prediction],
-                               feed_dict={
-                                   images_batch: x,
-                                   labels_batch: y,
-                                   keep_prob: 1.0
-                               })
+print('ACC = {}, LOSS = {}, pred_label = {}, real_label = {}'.format(accuracy_, loss_val, class_prediction_, y_test))
 
-print('ACC = {}, LOSS = {} {}'.format(accuracy_, loss_val, class_prediction_))
 
+# hwang = 2
+# lee = 1
+# choi = 0
+for label_, image_ in zip(class_prediction_, original_img_list):
+    cv2.imshow(str(label_), image_)
+    cv2.waitKey(0)
+#

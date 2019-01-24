@@ -1,5 +1,5 @@
 import tensorflow as tf
-from alpha_version import tensor_func
+from alpha_version.backup import tensor_func
 import cv2
 import numpy as np
 
