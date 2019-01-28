@@ -3,7 +3,7 @@ from alpha_version import train_func
 import cv2
 import os
 
-BATCH_SIZE = 100
+BATCH_SIZE = 10
 NUM_CLASS = 2  # ouput / 2->0,1 / 4 -> 0,1,2,3
 NUM_CHANNEL = 3  # R G B
 
@@ -12,7 +12,7 @@ IMG_WEIGHT = 80
 
 MODEL_SAVE_DIR = 'model'
 
-x_train, y_train, original_images = train_func.set_data('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\alpha_version\\train_data')  # image load for cnn
+x_train, y_train, original_images = train_func.set_data('train_data')  # image load for cnn
 
 images_batch = tf.placeholder(dtype=tf.float32, shape=[None, IMG_HEIGHT, IMG_WEIGHT, NUM_CHANNEL], name="images_batch")
 labels_batch = tf.placeholder(dtype=tf.int32, shape=[None, ], name="labels_batch")
@@ -61,6 +61,8 @@ h_fc1_drop = tf.nn.dropout(fc1, keep_prob)
 y_pred = dense_layer(h_fc1_drop, 1024, NUM_CLASS, 'dense2', act=False)
 y_pred = tf.identity(y_pred, "ypred")
 
+probs = tf.nn.softmax(y_pred)
+
 class_prediction = tf.argmax(y_pred, 1, output_type=tf.int32, name='class_prediction')
 correct_prediction = tf.equal(class_prediction, labels_batch)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -74,13 +76,15 @@ saver = tf.train.Saver()
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-iter_ = train_func.train_data_iterator(x_train, y_train, BATCH_SIZE)
+iter_ = train_func.train_data_iterator(x_train, y_train, original_images, BATCH_SIZE)
 for step in range(100):
     images_batch_val, labels_batch_val = next(iter_)
-    accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
+    probs_, accuracy_, _, loss_val = sess.run([probs, accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
                                                                                  labels_batch:labels_batch_val,
                                                                                  keep_prob: 0.5 })
     print('Iteration {}: ACC={}, LOSS={}'.format(step, accuracy_, loss_val))
+    print('probs_', probs_)
+
 print('Training Finished....')
 
 
@@ -94,8 +98,12 @@ loss_, loss_val, accuracy_, class_prediction_ = sess.run([loss, loss_mean, accur
 print(loss_)
 print('ACC = {}, LOSS = {}, pred_label = {}, real_label = {}'.format(accuracy_, loss_val, class_prediction_, y_test))
 
-save_path = saver.save(sess, MODEL_SAVE_DIR + os.sep + 'model.ckpt')
-print('Model saved in file : {}'.format(save_path))
+for real, pred, item in zip(y_test, class_prediction_, original_img_list):
+    cv2.imshow(str(pred) + " real : " + str(real), item)
+    cv2.waitKey(0)
+
+#save_path = saver.save(sess, MODEL_SAVE_DIR + os.sep + 'model.ckpt')
+#print('Model saved in file : {}'.format(save_path))
 
 # hwang = 2
 # lee_train = 1
