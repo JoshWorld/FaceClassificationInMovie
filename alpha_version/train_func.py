@@ -10,7 +10,7 @@ def load_image(path):
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (80, 80), interpolation=cv2.INTER_CUBIC)
     img = img.astype(np.float32)
-    img = (img - np.mean(img)) / np.std(img)
+    #img = (img - np.mean(img)) / np.std(img)
     img = img/255
     return img, original_img
 

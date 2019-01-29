@@ -23,7 +23,7 @@ def con_layer(input_tensor, filter_size, in_channels, out_channels, layer_name):
         filt = tf.get_variable(name="filter", shape=[filter_size, filter_size, in_channels, out_channels], dtype=tf.float32)
         bias = tf.get_variable(name='bias', shape=[out_channels], dtype=tf.float32)
         pre_act = tf.nn.conv2d(input_tensor, filt, [1,1,1,1], padding='SAME') + bias
-        activated =  tf.nn.relu(pre_act)
+        activated = tf.nn.relu(pre_act)
         return activated
 
 
@@ -61,15 +61,14 @@ h_fc1_drop = tf.nn.dropout(fc1, keep_prob)
 y_pred = dense_layer(h_fc1_drop, 1024, NUM_CLASS, 'dense2', act=False)
 y_pred = tf.identity(y_pred, "ypred")
 
-probs = tf.nn.softmax(y_pred)
-
 class_prediction = tf.argmax(y_pred, 1, output_type=tf.int32, name='class_prediction')
 correct_prediction = tf.equal(class_prediction, labels_batch)
+
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=y_pred, labels=labels_batch)
 loss_mean = tf.reduce_mean(loss)
-train_op = tf.train.AdamOptimizer().minimize(loss_mean)
+train_op = tf.train.AdamOptimizer(0.001).minimize(loss_mean)
 
 # For model save
 saver = tf.train.Saver()
@@ -79,11 +78,11 @@ sess.run(tf.global_variables_initializer())
 iter_ = train_func.train_data_iterator(x_train, y_train, original_images, BATCH_SIZE)
 for step in range(100):
     images_batch_val, labels_batch_val = next(iter_)
-    probs_, accuracy_, _, loss_val = sess.run([probs, accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
+    accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],feed_dict={images_batch:images_batch_val,
                                                                                  labels_batch:labels_batch_val,
                                                                                  keep_prob: 0.5 })
     print('Iteration {}: ACC={}, LOSS={}'.format(step, accuracy_, loss_val))
-    print('probs_', probs_)
+
 
 print('Training Finished....')
 
