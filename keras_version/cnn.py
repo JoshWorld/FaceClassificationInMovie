@@ -20,7 +20,7 @@ model.add(layers.Dense(2, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
 
-# data processing
+# data processing, generator
 BATCH_SIZE = 16
 
 train_data_gen = ImageDataGenerator(rescale=1./255)
@@ -33,15 +33,36 @@ train_generator = train_data_gen.flow_from_directory(
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
-validation_data_gen = validation_data_gen.flow_from_directory(
+validation_gen = validation_data_gen.flow_from_directory(
         'data/train',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
-test_data_gen = test_data_gen.flow_from_directory(
+test_gen = test_data_gen.flow_from_directory(
         'data/train',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
+# training
+model.fit_generator(
+        train_generator,
+        steps_per_epoch=1000//BATCH_SIZE,
+        validation_data=validation_gen,
+        epochs=50)
+
+# saving
+#model.save_weights('model')
+
+# evaluating
+print("-- Evaluate --")
+scores = model.evaluate_generator(test_gen, steps=5)
+print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
+# using model
+# print("-- Predict --")
+# output = model.predict_generator(test_generator, steps=5)
+# np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+# print(test_generator.class_indices)
+# print(output)
