@@ -67,8 +67,8 @@ loss_mean = tf.reduce_mean(loss)
 train_op = tf.train.AdamOptimizer().minimize(loss_mean)
 
 # training
-train_features, train_labels, _, _ = load_data('train_data', IMG_HEIGHT, IMG_WIDTH)
-test_features, test_labels, _, _ = load_data('test_data', IMG_HEIGHT, IMG_WIDTH)
+train_features, train_labels, _, _, _ = load_data('train_data', IMG_HEIGHT, IMG_WIDTH, 1.0)
+test_features, test_labels, _, _, _ = load_data('test_data', IMG_HEIGHT, IMG_WIDTH, 1.0)
 
 train_labels_one_hot = tf.squeeze(tf.one_hot(train_labels, 2))
 test_labels_one_hot = tf.squeeze(tf.one_hot(test_labels, 2))
@@ -78,7 +78,7 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
     iter_ = train_data_iterator(train_features, train_labels_one_hot.eval(session=sess))
-    for step in range(100):
+    for step in range(1000):
         images_batch_val, labels_batch_val = next(iter_)
         accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],
                                           feed_dict={
@@ -96,11 +96,7 @@ with tf.Session() as sess:
                             keep_prob: 1.0
                             })
 
-
-
     print(class_prediction_val, test_labels, accuracy_, loss_val)
-
-
 
 
 # print('Test begins….')

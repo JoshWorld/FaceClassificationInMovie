@@ -28,19 +28,19 @@ validation_data_gen = ImageDataGenerator(rescale=1./255)
 test_data_gen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_data_gen.flow_from_directory(
-        'train_data/train',
+        'data/train',
         target_size=(80, 80),  # All image resize
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
 validation_gen = validation_data_gen.flow_from_directory(
-        'train_data/valid',
+        'data/valid',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
 test_gen = test_data_gen.flow_from_directory(
-        'train_data/test',
+        'data/test',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
