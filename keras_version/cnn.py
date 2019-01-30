@@ -20,7 +20,7 @@ model.add(layers.Dense(2, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
 
-# data processing, generator
+# train_data processing, generator
 BATCH_SIZE = 16
 
 train_data_gen = ImageDataGenerator(rescale=1./255)
@@ -28,19 +28,19 @@ validation_data_gen = ImageDataGenerator(rescale=1./255)
 test_data_gen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_data_gen.flow_from_directory(
-        'data/train',
+        'train_data/train',
         target_size=(80, 80),  # All image resize
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
 validation_gen = validation_data_gen.flow_from_directory(
-        'data/valid',
+        'train_data/valid',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
 test_gen = test_data_gen.flow_from_directory(
-        'data/test',
+        'train_data/test',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')

@@ -19,9 +19,9 @@ category_index = label_map_util.create_category_index(categories)
 
 cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4")
 
-_, image = cap.read()
-[h, w] = image.shape[:2]
-out = cv2.VideoWriter("test_out.avi", 0, 25.0, (w, h))
+# _, image = cap.read()
+# [h, w] = image.shape[:2]
+# out = cv2.VideoWriter("test_out.avi", 0, 25.0, (w, h))
 
 detection_graph = tf.Graph()
 
@@ -68,17 +68,14 @@ with detection_graph.as_default():
                     y_max = int(h * box_val[2])
                     x_max = int(w * box_val[3])
 
-                    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
-
-            cv2.imshow('frame',image)
-            cv2.waitKey(1)
-            out.write(image)
+                    #cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
 
 
-                    #crop_img = image.copy()[y_min:y_max, x_min:x_max]
-                    #cv2.imwrite('sinsegae_face/frame{}.jpg'.format(c),crop_img)
+                    crop_img = image.copy()[y_min:y_max, x_min:x_max]
+                    cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
+
             c = c + 1
 
 
         cap.release()
-        out.release()
+        #out.release()

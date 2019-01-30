@@ -14,7 +14,7 @@ def load_image(addr, img_height, img_width):
     return img
 
 
-def load_data(image_dir_base):
+def load_data(image_dir_base, image_height, image_width):
     image_dir_list = os.listdir(image_dir_base)
 
     features = []
@@ -23,7 +23,7 @@ def load_data(image_dir_base):
     for class_index, dir_name in enumerate(image_dir_list):
         image_list = os.listdir(image_dir_base + os.sep + dir_name)
         for file_name in image_list:
-            image = load_image(image_dir_base + os.sep + dir_name + os.sep + file_name)
+            image = load_image(image_dir_base + os.sep + dir_name + os.sep + file_name, image_height, image_width)
             features.append(image)
             labels.append(class_index)
 
