@@ -28,7 +28,7 @@ def con_layer(input_tensor, filter_size, in_channels, out_channels, layer_name):
 
 
 def max_pool_2x2(x):
-    return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
+    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
 def dense_layer(input_tensor, input_dim, output_dim, layer_name, act=True):
@@ -43,7 +43,7 @@ def dense_layer(input_tensor, input_dim, output_dim, layer_name, act=True):
 
 input_shape = images_batch.get_shape()[1:]
 
-# cnn layerd
+# cnn layer
 conv1 = con_layer(images_batch, 5, input_shape[2], 32, 'con_layer1') # (input_tensor, filter_size, in_channels, out_channels, layer_name)
 h_pool1 = max_pool_2x2(conv1)
 conv2 = con_layer(h_pool1, 5, 32, 64, 'con_layer2')

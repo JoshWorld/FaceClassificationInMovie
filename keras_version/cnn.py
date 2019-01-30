@@ -34,13 +34,13 @@ train_generator = train_data_gen.flow_from_directory(
         class_mode='categorical')
 
 validation_gen = validation_data_gen.flow_from_directory(
-        'data/train',
+        'data/valid',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
 
 test_gen = test_data_gen.flow_from_directory(
-        'data/train',
+        'data/test',
         target_size=(80, 80),
         batch_size=BATCH_SIZE,
         class_mode='categorical')
