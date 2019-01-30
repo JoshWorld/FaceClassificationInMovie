@@ -67,33 +67,47 @@ loss_mean = tf.reduce_mean(loss)
 train_op = tf.train.AdamOptimizer().minimize(loss_mean)
 
 # training
-train_features, train_labels, test_features, test_labels = load_data('train_data', IMG_HEIGHT, IMG_WIDTH)
+train_features, train_labels, _, _ = load_data('train_data', IMG_HEIGHT, IMG_WIDTH)
+test_features, test_labels, _, _ = load_data('test_data', IMG_HEIGHT, IMG_WIDTH)
+
 train_labels_one_hot = tf.squeeze(tf.one_hot(train_labels, 2))
 test_labels_one_hot = tf.squeeze(tf.one_hot(test_labels, 2))
 
-sess = tf.Session()
-sess.run(tf.global_variables_initializer())
+with tf.Session() as sess:
 
-iter_ = train_data_iterator(train_features, train_labels_one_hot.eval(session=sess))
-for step in range(70):
-    images_batch_val, labels_batch_val = next(iter_)
-    accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],
-                                      feed_dict={
-                                          images_batch: images_batch_val,
-                                          labels_batch: labels_batch_val,
-                                          keep_prob: 0.5
-                                      })
-    print('Iteration {}: ACC={}, LOSS={}'.format(step, accuracy_, loss_val))
+    sess.run(tf.global_variables_initializer())
 
-print('Test begins….')
-TEST_BSIZE = 50
-for i in range(int(len(test_features)/TEST_BSIZE)):
-    images_batch_val = test_features[i*TEST_BSIZE:(i+1)*TEST_BSIZE]
-    labels_batch_val = test_labels_one_hot.eval(session=sess)[i*TEST_BSIZE:(i+1)*TEST_BSIZE]
+    iter_ = train_data_iterator(train_features, train_labels_one_hot.eval(session=sess))
+    for step in range(70):
+        images_batch_val, labels_batch_val = next(iter_)
+        accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],
+                                          feed_dict={
+                                              images_batch: images_batch_val,
+                                              labels_batch: labels_batch_val,
+                                              keep_prob: 0.5
+                                          })
+        print('Iteration {}: ACC={}, LOSS={}'.format(step, accuracy_, loss_val))
+
+    print('Test begins….')
 
     loss_val, accuracy_ = sess.run([loss_mean, accuracy], feed_dict={
-                        images_batch: images_batch_val,
-                        labels_batch: labels_batch_val,
-                        keep_prob: 1.0
-                        })
-    print('ACC = {}, LOSS = {}'.format(accuracy_, loss_val))
+                            images_batch: test_features,
+                            labels_batch: test_labels_one_hot.eval(session=sess),
+                            keep_prob: 1.0
+                            })
+    print(accuracy)
+
+
+
+# print('Test begins….')
+# TEST_BSIZE = 50
+# for i in range(int(len(test_features)/TEST_BSIZE)):
+#     images_batch_val = test_features[i*TEST_BSIZE:(i+1)*TEST_BSIZE]
+#     labels_batch_val = test_labels_one_hot.eval(session=sess)[i*TEST_BSIZE:(i+1)*TEST_BSIZE]
+#
+#     loss_val, accuracy_ = sess.run([loss_mean, accuracy], feed_dict={
+#                         images_batch: images_batch_val,
+#                         labels_batch: labels_batch_val,
+#                         keep_prob: 1.0
+#                         })
+#     print('ACC = {}, LOSS = {}'.format(accuracy_, loss_val))

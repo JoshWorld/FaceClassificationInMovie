@@ -41,8 +41,6 @@ def load_data(image_dir_base, image_height, image_width):
     test_features = features[int(0.8 * len(features)):]
     test_labels = labels[int(0.8 * len(labels)):]
 
-    print(train_labels)
-
     return train_features, train_labels, test_features, test_labels
 
 
