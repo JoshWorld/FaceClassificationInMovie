@@ -78,7 +78,7 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
     iter_ = train_data_iterator(train_features, train_labels_one_hot.eval(session=sess))
-    for step in range(70):
+    for step in range(100):
         images_batch_val, labels_batch_val = next(iter_)
         accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],
                                           feed_dict={
@@ -90,12 +90,16 @@ with tf.Session() as sess:
 
     print('Test begins….')
 
-    loss_val, accuracy_ = sess.run([loss_mean, accuracy], feed_dict={
+    class_prediction_val, loss_val, accuracy_ = sess.run([class_prediction, loss_mean, accuracy], feed_dict={
                             images_batch: test_features,
                             labels_batch: test_labels_one_hot.eval(session=sess),
                             keep_prob: 1.0
                             })
-    print(accuracy)
+
+
+
+    print(class_prediction_val, test_labels, accuracy_, loss_val)
+
 
 
 
