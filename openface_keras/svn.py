@@ -3,7 +3,7 @@ from openface_keras import image_to_embedding
 import numpy as np
 
 x_data, y_data = image_to_embedding.image_to_embedding('data')
-print(x_data)
+print(x_data[0])
 print(y_data)
 
 
