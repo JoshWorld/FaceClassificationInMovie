@@ -5,44 +5,47 @@ from keras.models import Sequential
 from keras.layers import Dense, Embedding, LSTM
 from keras.layers import Flatten, Dropout
 from keras.layers import Conv1D, GlobalMaxPooling1D
-from openface_keras import image_to_embedding
 
 max_features = 20000
+text_max_words = 200
 
-x, y = image_to_embedding.image_to_embedding('data')
+# 1. 데이터셋 생성하기
 
-print(x.shape)
+# 훈련셋과 시험셋 불러오기
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=max_features)
 
+# 훈련셋과 검증셋 분리
+x_val = x_train[20000:]
+y_val = y_train[20000:]
+x_train = x_train[:20000]
+y_train = y_train[:20000]
 
-x_val = x[:int(0.2*len(x))]
-y_val = y[:int(0.2*len(y))]
-x_train = x[int(0.2*len(x)): int(0.8*len(x))]
-y_train = y[int(0.2*len(y)): int(0.8*len(x))]
-x_test = x[int(0.8*len(x)):]
-y_test = y[int(0.8*len(y)):]
+# 데이터셋 전처리 : 문장 길이 맞추기
+x_train = sequence.pad_sequences(x_train, maxlen=text_max_words)
+x_val = sequence.pad_sequences(x_val, maxlen=text_max_words)
+x_test = sequence.pad_sequences(x_test, maxlen=text_max_words)
 
-print(len(x_test), len(x_val), len(x_train))
-print(y_val)
-print(x_val)
+print(x_train.shape)
 
+# 2. 모델 구성하기
 model = Sequential()
-model.add(Embedding(max_features, 128, input_length=128))
+model.add(Embedding(max_features, 128, input_length=text_max_words))
 model.add(Dropout(0.2))
 model.add(Conv1D(256,
-                 2,
+                 3,
                  padding='valid',
                  activation='relu',
                  strides=1))
 model.add(GlobalMaxPooling1D())
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.7))
-model.add(Dense(1, activation='softmax'))
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(1, activation='sigmoid'))
 
 # 3. 모델 학습과정 설정하기
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # 4. 모델 학습시키기
-hist = model.fit(x_train, y_train, epochs=100, batch_size=5, validation_data=(x_val, y_val))
+hist = model.fit(x_train, y_train, epochs=2, batch_size=64, validation_data=(x_val, y_val))
 
 # 5. 학습과정 살펴보기
 import matplotlib.pyplot as plt

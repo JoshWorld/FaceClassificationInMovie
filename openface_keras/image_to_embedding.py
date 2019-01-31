@@ -44,7 +44,23 @@ def image_to_embedding(image_base_dir):
                 image = load_img(image_path)
                 x = model.predict_on_batch(image)
                 features.append(x)
-                labels.append(class_index)
+
+                if class_index == 0:
+                    labels.append([0,1])
+                else:
+                    labels.append([1,0])
+
+        from random import shuffle
+
+        c = list(zip(features, labels))
+        shuffle(c)
+        features, labels = zip(*c)
+
+        features = np.array(features, dtype=np.float32).squeeze()
+
+        labels = np.array(labels)
+
+        print('ll', labels[0])
 
     return features, labels
 
