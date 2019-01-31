@@ -51,7 +51,7 @@ model.fit_generator(
         steps_per_epoch=1000//BATCH_SIZE,
         validation_data=validation_gen,
         validation_steps=20,
-        epochs=50)
+        epochs=10)
 
 # saving
 #model.save_weights('model')

@@ -29,4 +29,3 @@ with CustomObjectScope({'tf': tf}):
     print(y)
     print('y2', y2)
     print(dist)
-
