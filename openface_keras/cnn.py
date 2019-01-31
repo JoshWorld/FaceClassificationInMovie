@@ -1,97 +1,69 @@
-from tensor_version.tesnor_read_input import *
-import tensorflow as tf
-
-# set train_data
-embedding_height = 128
-embedding_width = 128
-
-# input tensor
-images_batch = tf.placeholder(dtype=tf.float32,
-                              shape=[None, embedding_height, embedding_width])
-labels_batch = tf.placeholder(dtype=tf.int32, shape=[None, 2])  # one hot
-keep_prob = tf.placeholder(tf.float32)
-
-
-# cnn layer function
-def con_layer(input_tensor, filter_size, in_channels, out_channels, layer_name):
-    with tf.variable_scope(layer_name):
-        filt = tf.get_variable(name="filter", shape=[filter_size, filter_size, in_channels, out_channels], dtype=tf.float32)
-        bias = tf.get_variable(name='bias', shape=[out_channels], dtype=tf.float32)
-        pre_activate = tf.nn.conv2d(input_tensor, filt, [1, 1, 1, 1], padding='SAME') + bias
-        activated = tf.nn.relu(pre_activate)
-        return activated
-
-
-# max pool function
-def max_pool_2x2(x):
-    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-
-
-# dense layer function
-def dense_layer(input_tensor, input_dim, output_dim, layer_name, act=True):
-    with tf.variable_scope(layer_name):
-        weights = tf.get_variable(name="weight", shape=[input_dim, output_dim])
-        biases = tf.get_variable(name='bias', shape=[output_dim])
-        preactivate = tf.matmul(input_tensor, weights) + biases
-        if act:
-            return tf.nn.relu(preactivate)
-        return preactivate
-
-
-input_tensor_shape = images_batch.get_shape()[1:]
+from keras import layers
+from keras import models
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 
 # graph
-conv1 = con_layer(images_batch, 5, input_tensor_shape[2], 32, 'con_layer1')
-h_pool1 = max_pool_2x2(conv1)
-conv2 = con_layer(h_pool1, 5, 32, 64, 'con_layer2')
-h_pool2 = max_pool_2x2(conv2)
+model = models.Sequential()
 
-fc_size = input_tensor_shape[0]//4*input_tensor_shape[1]//4*64
-h_pool2_flat = tf.reshape(h_pool2, [-1, fc_size])
+model.add(layers.Conv2D(filters=32, kernel_size=(5, 5), padding='same', activation='relu', input_shape=(80, 80, 3)))
+model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-fc1 = dense_layer(h_pool2_flat, fc_size, 1024, 'dense1')
-h_fc1_drop = tf.nn.dropout(fc1, keep_prob)
+model.add(layers.Conv2D(filters=64, kernel_size=(5, 5), padding='same', activation='relu'))
+model.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-y_pred = dense_layer(h_fc1_drop, 1024, NUM_CLASS, 'dense2', act=False)
+model.add(layers.Flatten())
 
-class_prediction = tf.argmax(y_pred, 1, output_type=tf.int32)
-correct_prediction = tf.equal(class_prediction,
-                              tf.argmax(labels_batch, 1, output_type=tf.int32))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dropout(0.5))
 
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+model.add(layers.Dense(2, activation='softmax'))
 
-loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=y_pred, labels=labels_batch)
-loss_mean = tf.reduce_mean(loss)
-train_op = tf.train.AdamOptimizer().minimize(loss_mean)
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
+
+# train_data processing, generator
+BATCH_SIZE = 16
+
+train_data_gen = ImageDataGenerator(rescale=1./255)
+validation_data_gen = ImageDataGenerator(rescale=1./255)
+test_data_gen = ImageDataGenerator(rescale=1./255)
+
+train_generator = train_data_gen.flow_from_directory(
+        'data/train',
+        target_size=(80, 80),  # All image resize
+        batch_size=BATCH_SIZE,
+        class_mode='categorical')
+
+validation_gen = validation_data_gen.flow_from_directory(
+        'data/valid',
+        target_size=(80, 80),
+        batch_size=BATCH_SIZE,
+        class_mode='categorical')
+
+test_gen = test_data_gen.flow_from_directory(
+        'data/test',
+        target_size=(80, 80),
+        batch_size=BATCH_SIZE,
+        class_mode='categorical')
 
 # training
-train_features, train_labels, _, _, _ = load_data('train_data', IMG_HEIGHT, IMG_WIDTH, 1.0)
-test_features, test_labels, _, _, _ = load_data('test_data', IMG_HEIGHT, IMG_WIDTH, 1.0)
+model.fit_generator(
+        train_generator,
+        steps_per_epoch=1000//BATCH_SIZE,
+        validation_data=validation_gen,
+        validation_steps=20,
+        epochs=10)
 
-train_labels_one_hot = tf.squeeze(tf.one_hot(train_labels, 2))
-test_labels_one_hot = tf.squeeze(tf.one_hot(test_labels, 2))
+# saving
+#model.save_weights('model')
 
-with tf.Session() as sess:
+# evaluating
+print("-- Evaluate --")
+scores = model.evaluate_generator(test_gen, steps=5)
+print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
-    sess.run(tf.global_variables_initializer())
-
-    iter_ = train_data_iterator(train_features, train_labels_one_hot.eval(session=sess))
-    for step in range(1000):
-        images_batch_val, labels_batch_val = next(iter_)
-        accuracy_, _, loss_val = sess.run([accuracy, train_op, loss_mean],
-                                          feed_dict={
-                                              images_batch: images_batch_val,
-                                              labels_batch: labels_batch_val,
-                                              keep_prob: 0.5
-                                          })
-        print('Iteration {}: ACC={}, LOSS={}'.format(step, accuracy_, loss_val))
-
-    print('Test begins….')
-
-    class_prediction_val, loss_val, accuracy_ = sess.run([class_prediction, loss_mean, accuracy], feed_dict={
-                            images_batch: test_features,
-                            labels_batch: test_labels_one_hot.eval(session=sess),
-                            keep_prob: 1.0
-                            })
-
-    print(class_prediction_val, test_labels, accuracy_, loss_val)
+# using model
+# print("-- Predict --")
+# output = model.predict_generator(test_generator, steps=5)
+# np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+# print(test_generator.class_indices)
+# print(output)

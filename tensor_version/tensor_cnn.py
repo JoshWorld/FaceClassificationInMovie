@@ -42,6 +42,8 @@ def dense_layer(input_tensor, input_dim, output_dim, layer_name, act=True):
 
 input_tensor_shape = images_batch.get_shape()[1:]
 
+print(input_tensor_shape)
+
 # graph
 conv1 = con_layer(images_batch, 5, input_tensor_shape[2], 32, 'con_layer1')
 h_pool1 = max_pool_2x2(conv1)
