@@ -61,7 +61,7 @@ def set_figure(images, titles, cols=10):
 
     columns = 10
     rows = 10
-    fig = plt.figure(figsize=(10,10))
+    fig = plt.figure(figsize=(7,7))
 
     for i in range(1, len(titles) + 1):
         img = images[i-1]
