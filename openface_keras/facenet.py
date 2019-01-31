@@ -260,6 +260,7 @@ def load_data(image_paths, do_random_crop, do_random_flip, image_size, do_prewhi
     for i in range(nrof_samples):
         # img = misc.imread(image_paths[i])
         img = cv2.imread(image_paths[i], 1)
+        img = cv2.resize(img, (96, 96), interpolation=cv2.INTER_CUBIC)
         img = img[...,::-1]
         img = np.around(img/255.0, decimals=12)
         if img.ndim == 2:

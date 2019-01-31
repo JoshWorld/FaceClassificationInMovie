@@ -29,7 +29,7 @@ from __future__ import print_function
 
 import os
 import numpy as np
-import facenet
+from openface_keras import facenet
 
 
 def evaluate(embeddings, actual_issame, nrof_folds=10):
@@ -37,6 +37,7 @@ def evaluate(embeddings, actual_issame, nrof_folds=10):
     thresholds = np.arange(0, 4, 0.01)
     embeddings1 = embeddings[0::2]
     embeddings2 = embeddings[1::2]
+    print(len(embeddings1))
     tpr, fpr, accuracy = facenet.calculate_roc(thresholds, embeddings1, embeddings2,
                                                np.asarray(actual_issame), nrof_folds=nrof_folds)
     thresholds = np.arange(0, 4, 0.001)
@@ -50,14 +51,18 @@ def get_paths(lfw_dir, pairs, file_ext):
     path_list = []
     issame_list = []
     for pair in pairs:
+
         if len(pair) == 3:
             path0 = os.path.join(lfw_dir, pair[0], pair[0] + '_' + '%04d' % int(pair[1]) + '.' + file_ext)
+            print(path0)
             path1 = os.path.join(lfw_dir, pair[0], pair[0] + '_' + '%04d' % int(pair[2]) + '.' + file_ext)
+            print("path1",path1)
             issame = True
         elif len(pair) == 4:
             path0 = os.path.join(lfw_dir, pair[0], pair[0] + '_' + '%04d' % int(pair[1]) + '.' + file_ext)
             path1 = os.path.join(lfw_dir, pair[2], pair[2] + '_' + '%04d' % int(pair[3]) + '.' + file_ext)
             issame = False
+
         if os.path.exists(path0) and os.path.exists(path1):  # Only add the pair if both paths exist
             path_list += (path0, path1)
             issame_list.append(issame)
