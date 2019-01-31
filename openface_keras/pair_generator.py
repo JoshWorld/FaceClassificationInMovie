@@ -60,6 +60,7 @@ class GeneratePairs:
             remaining = [f_n for f_n in remaining if f_n != ".DS_Store"]
             # del remaining[i] # deletes the file from the list, so that it is not chosen again
             other_dir = random.choice(remaining)
+
             with open(self.pairs_filepath, "a") as f:
                 for i in range(3):
                     file1 = random.choice(os.listdir(self.data_dir + name))
@@ -67,9 +68,8 @@ class GeneratePairs:
                     f.write(name + "\t" + file1.split("_")[2].lstrip("0").rstrip(self.img_ext) + "\t")
                 f.write("\n")
 
-
 if __name__ == '__main__':
-    data_dir = "my_own_datasets/"
+    data_dir = "data/"
     pairs_filepath = "pairs.txt"
     img_ext = ".jpg"
     generatePairs = GeneratePairs(data_dir, pairs_filepath, img_ext)

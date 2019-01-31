@@ -2,6 +2,9 @@ import os
 import numpy as np
 import math
 from openface_keras import facenet
+from openface_keras import lfw
+
+
 import time
 import tensorflow as tf
 from keras.models import load_model
@@ -16,7 +19,6 @@ with CustomObjectScope({'tf': tf}):
     lfw_nrof_folds=10
     image_size=96
     batch_size=100
-
 
     # Read the file containing the pairs used for testing
     pairs = lfw.read_pairs(os.path.expanduser(lfw_pairs))
