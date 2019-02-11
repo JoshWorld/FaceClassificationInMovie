@@ -7,10 +7,8 @@ import numpy as np
 import tensorflow as tf
 import cv2
 from utils import label_map_util
-from keras.models import load_model
-from keras.utils import CustomObjectScope
+import get_embedding_vector
 
-model = load_model('model/nn4.small2.lrn.h5')
 
 PATH_TO_CKPT = 'models/face_detection_graph.pb'
 PATH_TO_LABELS = 'labels/face_label_map.pbtxt'
@@ -76,13 +74,8 @@ with detection_graph.as_default():
                     cv2.imshow('t', image)
                     cv2.waitKey(1)
 
-
                     crop_img = image.copy()[y_min:y_max, x_min:x_max]
-
-                    with CustomObjectScope({'tf': tf}):
-
-                        y = model.predict_on_batch(crop_img)
-                        print(y)
+                    get_embedding_vector.func(crop_img)
 
 
                     #cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
