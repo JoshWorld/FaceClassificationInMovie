@@ -7,7 +7,6 @@ import numpy as np
 import tensorflow as tf
 import cv2
 from utils import label_map_util
-import get_embedding_vector
 from keras.models import load_model
 from keras.utils import CustomObjectScope
 
@@ -22,10 +21,6 @@ category_index = label_map_util.create_category_index(categories)
 
 cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\TRAIN_TO_BUSAN_HD_Trim.mp4")
 
-# _, image = cap.read()
-# [h, w] = image.shape[:2]
-# out = cv2.VideoWriter("test_out.avi", 0, 25.0, (w, h))
-
 detection_graph = tf.Graph()
 
 with detection_graph.as_default():
@@ -36,21 +31,22 @@ with detection_graph.as_default():
         tf.import_graph_def(od_graph_def, name='')
 
 
-with CustomObjectScope({'tf': tf}):
-    model = load_model('model/nn4.small2.lrn.h5')
+with detection_graph.as_default():
 
-    with detection_graph.as_default():
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
 
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
+    with tf.Session(graph=detection_graph, config=config) as sess:
+        with CustomObjectScope({'tf': tf}):
+            model = load_model('model/nn4.small2.lrn.h5')
 
-        with tf.Session(graph=detection_graph, config=config) as sess:
             c = 0
             while True:
                 ret, image = cap.read()
 
                 if ret == 0:
                     break
+
                 image_np = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 image_np_expanded = np.expand_dims(image_np, axis=0)
                 image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
@@ -85,14 +81,11 @@ with CustomObjectScope({'tf': tf}):
                         t = np.around(np.transpose(t, (0, 1, 2)) / 255.0, decimals=12)
                         t = np.array([t])
 
-                        model.predict_on_batch(t)
-
-
+                        y = model.predict_on_batch(t)
+                        print(y)
 
                         #cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
 
                 c = c + 1
 
-
             cap.release()
-            #out.release()
