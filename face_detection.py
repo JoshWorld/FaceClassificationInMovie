@@ -7,6 +7,10 @@ import numpy as np
 import tensorflow as tf
 import cv2
 from utils import label_map_util
+from keras.models import load_model
+from keras.utils import CustomObjectScope
+
+model = load_model('model/nn4.small2.lrn.h5')
 
 PATH_TO_CKPT = 'models/face_detection_graph.pb'
 PATH_TO_LABELS = 'labels/face_label_map.pbtxt'
@@ -17,7 +21,7 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4")
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\TRAIN_TO_BUSAN_HD_Trim.mp4")
 
 # _, image = cap.read()
 # [h, w] = image.shape[:2]
@@ -68,11 +72,20 @@ with detection_graph.as_default():
                     y_max = int(h * box_val[2])
                     x_max = int(w * box_val[3])
 
-                    #cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
+                    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
+                    cv2.imshow('t', image)
+                    cv2.waitKey(1)
 
 
                     crop_img = image.copy()[y_min:y_max, x_min:x_max]
-                    cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
+
+                    with CustomObjectScope({'tf': tf}):
+
+                        y = model.predict_on_batch(crop_img)
+                        print(y)
+
+
+                    #cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
 
             c = c + 1
 
