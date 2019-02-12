@@ -69,7 +69,7 @@ with detection_graph.as_default():
 
             frame_index = 0
             frame_list = []  # [ {'center':(123,21), 'embedding':[123,123,123]} ]
-            object_list = []  # [ {'label':'object0', 'center':(123,21), 'embedding':[123,123,123]}, {'label':'object1', 'center':(124,15), 'embedding':[120,100,140]} ]
+            face_group = []  # [ {'label':'object0', 'center':(123,21), 'embedding':[123,123,123]}, {'label':'object1', 'center':(124,15), 'embedding':[120,100,140]} ]
 
             while True:
                 ret, image = cap.read()
@@ -122,8 +122,17 @@ with detection_graph.as_default():
                                      'embedding_vector': embedding_vector}
 
                         face_list.append(face_dict)
-                for object_item in object_list:
 
+                for face in face_list:
+                    tmp_dis_group = []
+                    for group in face_group:
+                        dis = 0
+                        for item in group:
+                            dis = dis + get_vector_distance(item, face)
+                        m_dis = dis/len(group)
+                        tmp_dis_group.append(m_dis)
+                    min_idx = get_min_idx(tmp_dis_group)
+                    face_group[min_idx].append(face)
 
 
                 frame_list.append(face_list)
