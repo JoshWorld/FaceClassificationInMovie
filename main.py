@@ -16,6 +16,16 @@ def calc_vector_distance(v1, v2):
     return dist
 
 
+def get_min_idx(tmp_list):
+    min_idx = 0
+    min = tmp_list[0]
+    for idx, item in enumerate(tmp_list):
+        if item < min:
+            min_idx = idx
+            min = item
+    return min_idx
+
+
 def calc_min_distance(v1_list, v2_list):
     match_list = []
     for i in range(0, len(v1_list)):
@@ -137,26 +147,27 @@ with detection_graph.as_default():
                             print("m_dis : ", m_dis)
                             tmp_dis_group.append(m_dis)
 
-                    # min_idx = get_min_idx(tmp_dis_group)
-                    # face_group[min_idx].append(face)
+                        min_idx = get_min_idx(tmp_dis_group)
+                        face_group[min_idx].append(face)
 
+                    print(face_group)
 
-                frame_list.append(face_list)
-
-                # compare pre_frame and current_frame
-                if frame_index != 0:
-                    current_face_positions = np.array([item['center'] for item in frame_list[frame_index]])
-                    pre_face_positions = np.array([item['center'] for item in frame_list[frame_index-1]])
-                    result = calc_min_distance(pre_face_positions, current_face_positions)
-                    print(result)
-
-                    for item in result:
-                        if item['match_index'][0] == 1:
-                            cv2.circle(image, (current_face_positions[item['match_index'][1]][0], current_face_positions[item['match_index'][1]][1]), 10, (0, 0, 255), -1)
-                        else:
-
-                            cv2.circle(image, (current_face_positions[item['match_index'][1]][0],current_face_positions[item['match_index'][1]][1]), 10, (255, 0, 0),-1)
-
+                # frame_list.append(face_list)
+                #
+                # # compare pre_frame and current_frame
+                # if frame_index != 0:
+                #     current_face_positions = np.array([item['center'] for item in frame_list[frame_index]])
+                #     pre_face_positions = np.array([item['center'] for item in frame_list[frame_index-1]])
+                #     result = calc_min_distance(pre_face_positions, current_face_positions)
+                #     print(result)
+                #
+                #     for item in result:
+                #         if item['match_index'][0] == 1:
+                #             cv2.circle(image, (current_face_positions[item['match_index'][1]][0], current_face_positions[item['match_index'][1]][1]), 10, (0, 0, 255), -1)
+                #         else:
+                #
+                #             cv2.circle(image, (current_face_positions[item['match_index'][1]][0],current_face_positions[item['match_index'][1]][1]), 10, (255, 0, 0),-1)
+                #
 
                 cv2.imshow('t', image)
                 cv2.waitKey(1)
