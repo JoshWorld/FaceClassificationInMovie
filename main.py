@@ -18,11 +18,11 @@ def calc_vector_distance(v1, v2):
 
 def calc_min_distance(v1_list, v2_list):
     match_list = []
-    for i in range(1, len(v1_list)):
-        min_dist = calc_vector_distance(A[0], B[0])
+    for i in range(0, len(v1_list)):
+        min_dist = calc_vector_distance(v1_list[0], v2_list[0])
         min_idx = 0
-        for j in range(1, len(v2_list)):
-            dist = calc_vector_distance(A[i], B[j])
+        for j in range(0, len(v2_list)):
+            dist = calc_vector_distance(v1_list[i], v2_list[j])
             if dist < min_dist:
                 min_dist = dist
                 min_idx = j
@@ -68,7 +68,8 @@ with detection_graph.as_default():
             model = load_model('models/nn4.small2.lrn.h5')
 
             frame_index = 0
-            frame_list = []
+            frame_list = []  # [ {'center':(123,21), 'embedding':[123,123,123]} ]
+            object_list = []  # [ {'label':'object0', 'center':(123,21), 'embedding':[123,123,123]}, {'label':'object1', 'center':(124,15), 'embedding':[120,100,140]} ]
 
             while True:
                 ret, image = cap.read()
@@ -103,11 +104,7 @@ with detection_graph.as_default():
                         center_x = int(x_min + ((x_max - x_min) / 2))
                         center_y = int(y_min + ((y_max - y_min) / 2))
 
-                        cv2.circle(image, (center_x, center_y), 10, (0, 0, 255), -1)
-
                         cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
-                        cv2.imshow('t', image)
-                        cv2.waitKey(1)
 
                         crop_img = image.copy()[y_min:y_max, x_min:x_max]
 
@@ -125,17 +122,31 @@ with detection_graph.as_default():
                                      'embedding_vector': embedding_vector}
 
                         face_list.append(face_dict)
+                for object_item in object_list:
+
+
 
                 frame_list.append(face_list)
 
                 # compare pre_frame and current_frame
-                for face_a in frame_list[frame_index]:
-                    for face_b in frame_list[frame_index-1]:
-                        face_a['center']
+                if frame_index != 0:
+                    current_face_positions = np.array([item['center'] for item in frame_list[frame_index]])
+                    pre_face_positions = np.array([item['center'] for item in frame_list[frame_index-1]])
+                    result = calc_min_distance(pre_face_positions, current_face_positions)
+                    print(result)
+
+                    for item in result:
+                        if item['match_index'][0] == 1:
+                            cv2.circle(image, (current_face_positions[item['match_index'][1]][0], current_face_positions[item['match_index'][1]][1]), 10, (0, 0, 255), -1)
+                        else:
+
+                            cv2.circle(image, (current_face_positions[item['match_index'][1]][0],current_face_positions[item['match_index'][1]][1]), 10, (255, 0, 0),-1)
+
+
+                cv2.imshow('t', image)
+                cv2.waitKey(1)
 
                 frame_index = frame_index + 1
-
-
 
 
             cap.release()
