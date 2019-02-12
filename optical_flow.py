@@ -1,11 +1,11 @@
 import numpy as np
 import cv2
-cap = cv2.VideoCapture('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4')
+cap = cv2.VideoCapture('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sample01.mp4')
 # params for ShiTomasi corner detection
 feature_params = dict( maxCorners = 100,
-                       qualityLevel = 0.3,
-                       minDistance = 7,
-                       blockSize = 7 )
+                       qualityLevel = 0.03,
+                       minDistance = 10,
+                       blockSize = 5 )
 # Parameters for lucas kanade optical flow
 lk_params = dict( winSize  = (15,15),
                   maxLevel = 2,

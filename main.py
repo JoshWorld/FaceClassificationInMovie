@@ -41,8 +41,11 @@ with detection_graph.as_default():
             model = load_model('models/nn4.small2.lrn.h5')
 
             c = 0
+            frame_list = []
+
             while True:
                 ret, image = cap.read()
+                one_frame_faces = []
 
                 if ret == 0:
                     break
@@ -70,6 +73,11 @@ with detection_graph.as_default():
                         y_max = int(h * box_val[2])
                         x_max = int(w * box_val[3])
 
+                        center_x = int(x_min + ((x_max - x_min) / 2))
+                        center_y = int(y_min + ((y_max - y_min) / 2))
+
+                        cv2.circle(image, (center_x, center_y), 10, (0, 0, 255), -1)
+
                         cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
                         cv2.imshow('t', image)
                         cv2.waitKey(1)
@@ -81,10 +89,13 @@ with detection_graph.as_default():
                         t = np.around(np.transpose(t, (0, 1, 2)) / 255.0, decimals=12)
                         t = np.array([t])
 
-                        y = model.predict_on_batch(t)
-                        print(y)
+                        embedding_vector = model.predict_on_batch(t)
 
-                        #cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
+                        face_dict = {'score_val': score_val,
+                                     'x_min': x_min, 'x_max': x_max,
+                                     'y_min': y_min, 'y_max': y_max,
+                                     'center_x': center_x, 'center_y': center_y,
+                                     'embedding_vector':embedding_vector}
 
                 c = c + 1
 
