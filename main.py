@@ -122,17 +122,23 @@ with detection_graph.as_default():
                                      'embedding_vector': embedding_vector}
 
                         face_list.append(face_dict)
+                if len(face_group) == 0:
+                    face_group.append(face_list)
+                else:
 
-                for face in face_list:
-                    tmp_dis_group = []
-                    for group in face_group:
-                        dis = 0
-                        for item in group:
-                            dis = dis + get_vector_distance(item, face)
-                        m_dis = dis/len(group)
-                        tmp_dis_group.append(m_dis)
-                    min_idx = get_min_idx(tmp_dis_group)
-                    face_group[min_idx].append(face)
+                    for face in face_list:
+                        tmp_dis_group = []
+                        for group in face_group:
+                            dis = 0
+                            for item in group:
+                                dis = dis + calc_vector_distance(item['embedding_vector'], face['embedding_vector'])
+                                print("dis : ", dis)
+                            m_dis = dis/len(group)
+                            print("m_dis : ", m_dis)
+                            tmp_dis_group.append(m_dis)
+
+                    # min_idx = get_min_idx(tmp_dis_group)
+                    # face_group[min_idx].append(face)
 
 
                 frame_list.append(face_list)
