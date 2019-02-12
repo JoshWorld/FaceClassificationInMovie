@@ -10,6 +10,33 @@ from utils import label_map_util
 from keras.models import load_model
 from keras.utils import CustomObjectScope
 
+
+def calc_vector_distance(v1, v2):
+    dist = np.linalg.norm(v1 - v2)
+    return dist
+
+
+def calc_min_distance(v1_list, v2_list):
+    match_list = []
+    for i in range(1, len(v1_list)):
+        min_dist = calc_vector_distance(A[0], B[0])
+        min_idx = 0
+        for j in range(1, len(v2_list)):
+            dist = calc_vector_distance(A[i], B[j])
+            if dist < min_dist:
+                min_dist = dist
+                min_idx = j
+        match_list.append({'match_index':(i, min_idx),'min_dist':min_dist})
+
+    # Normalization
+    x = np.array([item['min_dist'] for item in match_list])
+    y = x / sum(x)
+
+    for item, norm_dist in zip(match_list, y):
+        item['norm_min_dist'] = norm_dist
+    return match_list
+
+
 PATH_TO_CKPT = 'models/face_detection_graph.pb'
 PATH_TO_LABELS = 'labels/face_label_map.pbtxt'
 
@@ -40,12 +67,12 @@ with detection_graph.as_default():
         with CustomObjectScope({'tf': tf}):
             model = load_model('models/nn4.small2.lrn.h5')
 
-            c = 0
+            frame_index = 0
             frame_list = []
 
             while True:
                 ret, image = cap.read()
-                one_frame_faces = []
+                face_list = []
 
                 if ret == 0:
                     break
@@ -92,11 +119,23 @@ with detection_graph.as_default():
                         embedding_vector = model.predict_on_batch(t)
 
                         face_dict = {'score_val': score_val,
-                                     'x_min': x_min, 'x_max': x_max,
-                                     'y_min': y_min, 'y_max': y_max,
-                                     'center_x': center_x, 'center_y': center_y,
-                                     'embedding_vector':embedding_vector}
+                                     'min': np.array([x_min, y_min]),
+                                     'max': np.array([x_max, y_max]),
+                                     'center': np.array([center_x, center_y]),
+                                     'embedding_vector': embedding_vector}
 
-                c = c + 1
+                        face_list.append(face_dict)
+
+                frame_list.append(face_list)
+
+                # compare pre_frame and current_frame
+                for face_a in frame_list[frame_index]:
+                    for face_b in frame_list[frame_index-1]:
+                        face_a['center']
+
+                frame_index = frame_index + 1
+
+
+
 
             cap.release()
