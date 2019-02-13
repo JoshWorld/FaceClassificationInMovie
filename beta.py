@@ -11,6 +11,14 @@ from keras.models import load_model
 from keras.utils import CustomObjectScope
 
 
+def max_value(my_list, key):
+    max = 0
+    for item in my_list:
+        if max < item[key]:
+            max = item[key]
+    return [False for _ in range(max+1)]
+
+
 def calc_vector_distance(v1, v2):
     dist = np.linalg.norm(v1 - v2)
     return dist
@@ -153,10 +161,30 @@ with detection_graph.as_default():
                             m_dis = dis/len(group)
                             tmp_dis_group.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis})
 
-                        face_info.append({'face_data': tmp_dis_group, 'check': False})
+                            face_info.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis,'center':face['center']})
 
-                    print(face_info)
-                    group_check = [False, False, False, False]
+                    sort_face = sorted(face_info, key=lambda k: k['distance'])
+
+                    print(sort_face)
+
+                    group_check = max_value(sort_face, 'group_idx')
+                    face_check = max_value(sort_face, 'face_idx')
+                    print(group_check, face_check)
+
+
+
+                    # [{'face_idx': 0, 'group_idx': 0, 'distance': 0.45119333267211914},
+                    # {'face_idx': 1, 'group_idx': 1, 'distance': 0.751081109046936},
+                    # {'face_idx': 0, 'group_idx': 1, 'distance': 0.7820329666137695},
+                    # {'face_idx': 1, 'group_idx': 0, 'distance': 0.9556329846382141}]
+
+                    for item in sort_face:
+                        print(item['face_idx'], item['group_idx'] )
+                        if not face_check[item['face_idx']] and not group_check[item['group_idx']]:
+                            cv2.circle(image, (face['center'][0], face['center'][1]), 10, (0, 0, 255), -1)
+
+                            face_check[item['face_idx']] = True
+                            group_check[item['group_idx']] = True
 
 
                     #
