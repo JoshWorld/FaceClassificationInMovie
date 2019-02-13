@@ -118,9 +118,12 @@ with detection_graph.as_default():
 
                         crop_img = image.copy()[y_min:y_max, x_min:x_max]
 
+                        crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
+
+
                         t = cv2.resize(crop_img, (96, 96), interpolation=cv2.INTER_CUBIC)
                         t = t[..., ::-1]
-                        t = np.around(np.transpose(t, (0, 1, 2)) / 255.0, decimals=12)
+                        t = np.around(np.transpose(t, (0, 1, 2)) / 179.0, decimals=12)
                         t = np.array([t])
 
                         embedding_vector = model.predict_on_batch(t)
@@ -146,9 +149,10 @@ with detection_graph.as_default():
                             for item in group:
 
                                 dis = dis + calc_vector_distance(item['embedding_vector'], face['embedding_vector'])
-                                #print("dis : ", dis)
+                                print("dis",calc_vector_distance(item['embedding_vector'], face['embedding_vector']))
+
                             m_dis = dis/len(group)
-                            print("dis",m_dis)
+                            print("mdis",m_dis)
                             tmp_dis_group.append(m_dis)
                         print('')
 
@@ -156,7 +160,7 @@ with detection_graph.as_default():
                         min_idx, min_value = get_min_idx(tmp_dis_group)
 
 
-                        if min_value < 0.7:
+                        if min_value < 0.9:
                             if min_idx == 1:
                                 cv2.circle(image, (face['center'][0],face['center'][1]), 10, (0, 0, 255),-1)
                             else:
@@ -164,8 +168,7 @@ with detection_graph.as_default():
 
                             face_group[min_idx].append(face)
                         else:
-                            pass
-                            #face_group.append([face])
+                            face_group.append([face])
 
                     print('face_group',len(face_group))
 

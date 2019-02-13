@@ -118,9 +118,12 @@ with detection_graph.as_default():
 
                         crop_img = image.copy()[y_min:y_max, x_min:x_max]
 
+                        crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
+
+
                         t = cv2.resize(crop_img, (96, 96), interpolation=cv2.INTER_CUBIC)
                         t = t[..., ::-1]
-                        t = np.around(np.transpose(t, (0, 1, 2)) / 255.0, decimals=12)
+                        t = np.around(np.transpose(t, (0, 1, 2)) / 179.0, decimals=12)
                         t = np.array([t])
 
                         embedding_vector = model.predict_on_batch(t)
@@ -138,36 +141,39 @@ with detection_graph.as_default():
                         face_group.append([i])
 
                 else:
-
-                    for face in face_list:
+                    face_info = []  # [ [ face와 group간 비교한 distance 결과] , [], [] ]
+                    for face_idx, face in enumerate(face_list):
                         tmp_dis_group = []
-                        for group in face_group:
+                        for group_idx, group in enumerate(face_group):
                             dis = 0
                             for item in group:
 
                                 dis = dis + calc_vector_distance(item['embedding_vector'], face['embedding_vector'])
-                                #print("dis : ", dis)
+
                             m_dis = dis/len(group)
-                            print("dis",m_dis)
-                            tmp_dis_group.append(m_dis)
-                        print('')
+                            tmp_dis_group.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis})
+
+                        face_info.append({'face_data': tmp_dis_group, 'check': False})
+
+                    print(face_info)
+                    group_check = [False, False, False, False]
 
 
-                        min_idx, min_value = get_min_idx(tmp_dis_group)
-
-
-                        if min_value < 0.7:
-                            if min_idx == 1:
-                                cv2.circle(image, (face['center'][0],face['center'][1]), 10, (0, 0, 255),-1)
-                            else:
-                                cv2.circle(image, (face['center'][0], face['center'][1]), 10, (255, 0, 0), -1)
-
-                            face_group[min_idx].append(face)
-                        else:
-                            pass
-                            #face_group.append([face])
-
-                    print('face_group',len(face_group))
+                    #
+                    #     min_idx, min_value = get_min_idx(tmp_dis_group)
+                    #
+                    #
+                    #     if min_value < 0.9:
+                    #         if min_idx == 1:
+                    #             cv2.circle(image, (face['center'][0],face['center'][1]), 10, (0, 0, 255),-1)
+                    #         else:
+                    #             cv2.circle(image, (face['center'][0], face['center'][1]), 10, (255, 0, 0), -1)
+                    #
+                    #         face_group[min_idx].append(face)
+                    #     else:
+                    #         face_group.append([face])
+                    #
+                    # print('face_group',len(face_group))
 
 
                 # frame_list.append(face_list)
