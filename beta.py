@@ -109,7 +109,7 @@ with detection_graph.as_default():
 
                 for score_val, box_val, class_val in zip(np.squeeze(scores), np.squeeze(boxes), np.squeeze(classes)):
 
-                    if score_val > 0.4 and class_val == 1:
+                    if score_val > 0.3 and class_val == 1:
                         h = image.shape[0]
                         w = image.shape[1]
 
@@ -122,12 +122,8 @@ with detection_graph.as_default():
                         center_x = int(x_min + ((x_max - x_min) / 2))
                         center_y = int(y_min + ((y_max - y_min) / 2))
 
-                        cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
-
                         crop_img = image.copy()[y_min:y_max, x_min:x_max]
-
                         crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
-
 
                         t = cv2.resize(crop_img, (96, 96), interpolation=cv2.INTER_CUBIC)
                         t = t[..., ::-1]
@@ -155,23 +151,18 @@ with detection_graph.as_default():
                         for group_idx, group in enumerate(face_group):
                             dis = 0
                             for item in group:
-
                                 dis = dis + calc_vector_distance(item['embedding_vector'], face['embedding_vector'])
 
                             m_dis = dis/len(group)
                             tmp_dis_group.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis})
-
-                            face_info.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis,'center':face['center']})
+                            face_info.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis,'center':face['center'], 'min':face['min'], 'max':face['max']})
 
                     sort_face = sorted(face_info, key=lambda k: k['distance'])
 
-                    print(sort_face)
+                    #print(sort_face)
 
                     group_check = max_value(sort_face, 'group_idx')
                     face_check = max_value(sort_face, 'face_idx')
-                    print(group_check, face_check)
-
-
 
                     # [{'face_idx': 0, 'group_idx': 0, 'distance': 0.45119333267211914},
                     # {'face_idx': 1, 'group_idx': 1, 'distance': 0.751081109046936},
@@ -179,50 +170,26 @@ with detection_graph.as_default():
                     # {'face_idx': 1, 'group_idx': 0, 'distance': 0.9556329846382141}]
 
                     for item in sort_face:
-                        print(item['face_idx'], item['group_idx'] )
-                        if not face_check[item['face_idx']] and not group_check[item['group_idx']]:
-                            cv2.circle(image, (face['center'][0], face['center'][1]), 10, (0, 0, 255), -1)
+                        if (face_check[item['face_idx']] == False) and (group_check[item['group_idx']] == False):
+
+                            if item['group_idx'] == 0:
+
+                                cv2.circle(image, (item['center'][0], item['center'][1]), 10, (0, 0, 255), -1)
+                                cv2.rectangle(image, tuple(item['min']), tuple(item['max']), (0, 0, 255), 2)
+                            else:
+
+                                cv2.circle(image, (item['center'][0], item['center'][1]), 10, (255, 0, 0), -1)
+                                cv2.rectangle(image, tuple(item['min']), tuple(item['max']), (255, 0, 0), 2)
 
                             face_check[item['face_idx']] = True
                             group_check[item['group_idx']] = True
+                            print(item)
 
+                    print("")
 
-                    #
-                    #     min_idx, min_value = get_min_idx(tmp_dis_group)
-                    #
-                    #
-                    #     if min_value < 0.9:
-                    #         if min_idx == 1:
-                    #             cv2.circle(image, (face['center'][0],face['center'][1]), 10, (0, 0, 255),-1)
-                    #         else:
-                    #             cv2.circle(image, (face['center'][0], face['center'][1]), 10, (255, 0, 0), -1)
-                    #
-                    #         face_group[min_idx].append(face)
-                    #     else:
-                    #         face_group.append([face])
-                    #
-                    # print('face_group',len(face_group))
-
-
-                # frame_list.append(face_list)
-                #
-                # # compare pre_frame and current_frame
-                # if frame_index != 0:
-                #     current_face_positions = np.array([item['center'] for item in frame_list[frame_index]])
-                #     pre_face_positions = np.array([item['center'] for item in frame_list[frame_index-1]])
-                #     result = calc_min_distance(pre_face_positions, current_face_positions)
-                #     print(result)
-                #
-                #     for item in result:
-                #         if item['match_index'][0] == 1:
-                #             cv2.circle(image, (current_face_positions[item['match_index'][1]][0], current_face_positions[item['match_index'][1]][1]), 10, (0, 0, 255), -1)
-                #         else:
-                #
-                #             cv2.circle(image, (current_face_positions[item['match_index'][1]][0],current_face_positions[item['match_index'][1]][1]), 10, (255, 0, 0),-1)
-                #
 
                 cv2.imshow('t', image)
-                cv2.waitKey(1)
+                cv2.waitKey(0)
 
                 frame_index = frame_index + 1
 
