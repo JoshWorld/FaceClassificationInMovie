@@ -56,7 +56,7 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sample01.mp4")
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\blackpink01.mp4")
 
 detection_graph = tf.Graph()
 
@@ -101,7 +101,7 @@ with detection_graph.as_default():
 
                 for score_val, box_val, class_val in zip(np.squeeze(scores), np.squeeze(boxes), np.squeeze(classes)):
 
-                    if score_val > 0.4 and class_val == 1:
+                    if score_val > 0.25 and class_val == 1:
                         h = image.shape[0]
                         w = image.shape[1]
 
@@ -114,7 +114,7 @@ with detection_graph.as_default():
                         center_x = int(x_min + ((x_max - x_min) / 2))
                         center_y = int(y_min + ((y_max - y_min) / 2))
 
-                        cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
+
 
                         crop_img = image.copy()[y_min:y_max, x_min:x_max]
 
@@ -163,8 +163,11 @@ with detection_graph.as_default():
                         if min_value < 0.9:
                             if min_idx == 1:
                                 cv2.circle(image, (face['center'][0],face['center'][1]), 10, (0, 0, 255),-1)
+                                cv2.rectangle(image, tuple(face['min']), tuple(face['max']), (0, 0, 255), 2)
+
                             else:
                                 cv2.circle(image, (face['center'][0], face['center'][1]), 10, (255, 0, 0), -1)
+                                cv2.rectangle(image, tuple(face['min']), tuple(face['max']), (255, 0, 0), 2)
 
                             face_group[min_idx].append(face)
                         else:
@@ -191,7 +194,8 @@ with detection_graph.as_default():
                 #
 
                 cv2.imshow('t', image)
-                cv2.waitKey(1)
+                cv2.imwrite('blackpink_error.jpg',image)
+                cv2.waitKey(0)
 
                 frame_index = frame_index + 1
 

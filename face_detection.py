@@ -18,7 +18,7 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sample02.mp4")
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\blackpink01.mp4")
 
 # _, image = cap.read()
 # [h, w] = image.shape[:2]
@@ -58,7 +58,7 @@ with detection_graph.as_default():
 
             for score_val, box_val, class_val in zip(np.squeeze(scores), np.squeeze(boxes), np.squeeze(classes)):
 
-                if score_val > 0.4 and class_val == 1:
+                if score_val > 0.25 and class_val == 1:
                     h = image.shape[0]
                     w = image.shape[1]
 
@@ -68,9 +68,16 @@ with detection_graph.as_default():
                     y_max = int(h * box_val[2])
                     x_max = int(w * box_val[3])
 
-                    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
-                    cv2.imshow('t', image)
-                    cv2.waitKey(1)
+                    #cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
+                    crop_img = image.copy()[y_min:y_max, x_min:x_max]
+                    cv2.imwrite('blackpink/b{}.jpg'.format(str(c)), crop_img)
+                    c = c + 1
+            cv2.imshow('t', image)
+            cv2.waitKey(1)
+
+
+
+
                     #
                     # crop_img = image.copy()[y_min:y_max, x_min:x_max]
                     #
@@ -83,7 +90,6 @@ with detection_graph.as_default():
 
                     #cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
 
-            c = c + 1
 
 
         cap.release()
