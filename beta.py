@@ -71,7 +71,7 @@ cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInM
 
 ret, frame = cap.read()
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output.mp4',fourcc, 20.0, (frame.shape[1],frame.shape[0]))
+out = cv2.VideoWriter('output_no_distance.mp4',fourcc, 20.0, (frame.shape[1],frame.shape[0]))
 
 
 detection_graph = tf.Graph()
@@ -185,7 +185,7 @@ with detection_graph.as_default():
 
 
 
-    
+
 
                     group_check = max_value(sort_face, 'group_idx')
                     face_check = max_value(sort_face, 'face_idx')
@@ -221,11 +221,11 @@ with detection_graph.as_default():
                 frame_index = frame_index + 1
 
 
-                import kmeans_test
+                import kmeans_function
                 z = []
                 for f in k_means:
                     z.append(f['embedding_vector'])
-                kmeans_test.show(np.array(z))
+                kmeans_function.show(np.array(z))
 
             cap.release()
             out.release()
