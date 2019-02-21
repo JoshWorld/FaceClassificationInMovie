@@ -4,6 +4,7 @@ from utils import label_map_util
 from keras.models import load_model
 from keras.utils import CustomObjectScope
 import numpy as np
+import pickle
 
 
 def max_value(my_list, key):
@@ -105,19 +106,24 @@ with detection_graph.as_default():
 
                         embedding_vector = model.predict_on_batch(t)
 
+                        # 얼굴을 감지 한 후 각 얼굴에 대한 최초 정보
                         face_dict = {'min': np.array([x_min, y_min]),
                                      'max': np.array([x_max, y_max]),
                                      'center': np.array([center_x, center_y]),
-                                     'embedding_vector': embedding_vector}
+                                     'embedding_vector': embedding_vector,
+                                    }
 
+                        # face_list 에 각 얼굴에 대한 최초 정보들이 모두 저장됨
                         face_list.append(face_dict)
 
+                # face_group 에 아무 원소가 없을 경우
                 if len(face_group) == 0:
                     for i in face_list:
                         face_group.append([i])
                 else:
 
                     face_info = []  # [ [ face와 group간 비교한 distance 결과] , [], [] ]
+
                     for face_idx, face in enumerate(face_list):
                         for group_idx, group in enumerate(face_group):
                             e_dis = 0  # embedding vector distance
@@ -128,9 +134,12 @@ with detection_graph.as_default():
                             e_m_dis = e_dis / len(group)
                             p_m_dis = p_dis / len(group)
 
-                            face_info.append({'face_idx': face_idx, 'group_idx': group_idx,
+                            face_dict = {'face_idx': face_idx, 'group_idx': group_idx,
                                               'e_distance': e_m_dis*E_DISTANCE_RATE, 'p_distance': p_m_dis*P_DISTANCE_RATE, 'sum': e_m_dis*E_DISTANCE_RATE + p_m_dis*P_DISTANCE_RATE,
-                                              'center': face['center'], 'min': face['min'], 'max': face['max']})
+                                              'center': face['center'], 'min': face['min'], 'max': face['max'],'embedding_vector': face['embedding_vector']}
+
+                            face_info.append(face_dict)
+                            face_group[face_dict['group_idx']].append(face_dict)
 
                     m = np.array([item['sum'] for item in face_info])
                     m = (m - np.mean(m)) / np.std(m)
@@ -152,7 +161,7 @@ with detection_graph.as_default():
                                 cv2.rectangle(image, tuple(item['min']), tuple(item['max']), color_list[item['group_idx']], 2)
                                 font = cv2.FONT_HERSHEY_SIMPLEX
                                 cv2.putText(image, "result: " + str(item['result']) + " / group_idx : " + str(item['group_idx']), tuple(item['max']), font, 0.5, color_list[item['group_idx']], 1, cv2.LINE_AA)
-
+                                #cv2.imwrite('blackpink/{}/blackpink_{}_{}_{}.jpg'.format(str(item['group_idx']), str(item['group_idx']), str(item['face_idx']), str(frame_index)), item['crop_image'])
                                 face_check[item['face_idx']] = True
                                 group_check[item['group_idx']] = True
 
@@ -164,6 +173,9 @@ with detection_graph.as_default():
                 cv2.waitKey(1)
 
                 frame_index = frame_index + 1
+
+            with open('face_data.save', 'wb') as file:
+                pickle.dump(face_group, file)
 
             cap.release()
             out.release()
