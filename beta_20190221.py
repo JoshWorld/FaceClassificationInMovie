@@ -141,8 +141,8 @@ with detection_graph.as_default():
                             p_m_dis = p_dis / len(group)
 
                             face_dict = {'face_idx': face_idx, 'group_idx': group_idx,
-                                              'e_distance': e_m_dis*E_DISTANCE_RATE, 'p_distance': p_m_dis*P_DISTANCE_RATE, 'sum': e_m_dis*E_DISTANCE_RATE + p_m_dis*P_DISTANCE_RATE,
-                                              'center': face['center'], 'min': face['min'], 'max': face['max'],'embedding_vector': face['embedding_vector']}
+                                         'e_distance': e_m_dis*E_DISTANCE_RATE, 'p_distance': p_m_dis*P_DISTANCE_RATE, 'sum': e_m_dis*E_DISTANCE_RATE + p_m_dis*P_DISTANCE_RATE,
+                                         'center': face['center'], 'min': face['min'], 'max': face['max'], 'embedding_vector': face['embedding_vector']}
 
                             face_info.append(face_dict)
 
@@ -176,7 +176,6 @@ with detection_graph.as_default():
 
                 with open('face_data.save', 'wb') as file:
                     pickle.dump(face_group, file)
-                    print(len(face_group))
 
                 cv2.imshow('test', image)
                 out.write(image)
