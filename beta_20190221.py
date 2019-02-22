@@ -139,7 +139,7 @@ with detection_graph.as_default():
                                               'center': face['center'], 'min': face['min'], 'max': face['max'],'embedding_vector': face['embedding_vector']}
 
                             face_info.append(face_dict)
-                            face_group[face_dict['group_idx']].append(face_dict)
+
 
                     m = np.array([item['sum'] for item in face_info])
                     m = (m - np.mean(m)) / np.std(m)
@@ -164,9 +164,14 @@ with detection_graph.as_default():
                                 #cv2.imwrite('blackpink/{}/blackpink_{}_{}_{}.jpg'.format(str(item['group_idx']), str(item['group_idx']), str(item['face_idx']), str(frame_index)), item['crop_image'])
                                 face_check[item['face_idx']] = True
                                 group_check[item['group_idx']] = True
+                                face_group[item['group_idx']].append(item)
 
                             else:
                                 face_group.append([item])
+
+                with open('face_data.save', 'wb') as file:
+                    pickle.dump(face_group, file)
+                    print(len(face_group))
 
                 cv2.imshow('test', image)
                 out.write(image)
@@ -174,8 +179,7 @@ with detection_graph.as_default():
 
                 frame_index = frame_index + 1
 
-            with open('face_data.save', 'wb') as file:
-                pickle.dump(face_group, file)
+
 
             cap.release()
             out.release()

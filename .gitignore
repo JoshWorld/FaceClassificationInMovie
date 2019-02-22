@@ -3,6 +3,7 @@ labels/
 data/
 .idea/
 __pycache__/
+blackpink/
 *.jpg
 *.PNG
 *.JPG
@@ -13,3 +14,4 @@ model/
 alpha_version/backup/
 alpha_version/model/
 .avi
+.mp4
