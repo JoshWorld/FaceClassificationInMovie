@@ -9,17 +9,6 @@ import cv2
 from utils import label_map_util
 from keras.models import load_model
 from keras.utils import CustomObjectScope
-import dlib
-
-
-hog = cv2.HOGDescriptor()
-
-def max_value(my_list, key):
-    max = 0
-    for item in my_list:
-        if max < item[key]:
-            max = item[key]
-    return [False for _ in range(max+1)]
 
 
 def calc_vector_distance(v1, v2):
@@ -67,12 +56,7 @@ label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\blackpink01.mp4")
-
-ret, frame = cap.read()
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output_no_distance.mp4',fourcc, 20.0, (frame.shape[1],frame.shape[0]))
-
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_data\\blackpink01.mp4")
 
 detection_graph = tf.Graph()
 
@@ -97,8 +81,6 @@ with detection_graph.as_default():
             frame_list = []  # [ {'center':(123,21), 'embedding':[123,123,123]} ]
             face_group = []  # [ {'label':'object0', 'center':(123,21), 'embedding':[123,123,123]}, {'label':'object1', 'center':(124,15), 'embedding':[120,100,140]} ]
 
-            k_means = []
-
             while True:
                 ret, image = cap.read()
                 face_list = []
@@ -119,7 +101,7 @@ with detection_graph.as_default():
 
                 for score_val, box_val, class_val in zip(np.squeeze(scores), np.squeeze(boxes), np.squeeze(classes)):
 
-                    if score_val > 0.2 and class_val == 1:
+                    if score_val > 0.25 and class_val == 1:
                         h = image.shape[0]
                         w = image.shape[1]
 
@@ -132,29 +114,27 @@ with detection_graph.as_default():
                         center_x = int(x_min + ((x_max - x_min) / 2))
                         center_y = int(y_min + ((y_max - y_min) / 2))
 
-                        crop_img = image.copy()[y_min:y_max, x_min:x_max]
-                        #crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
 
-                        # h = hog.compute(crop_img)
-                        # n = np.resize(h, (crop_img.shape[0], crop_img.shape[1], 3))
+
+                        crop_img = image.copy()[y_min:y_max, x_min:x_max]
+
+                        crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
+
 
                         t = cv2.resize(crop_img, (96, 96), interpolation=cv2.INTER_CUBIC)
                         t = t[..., ::-1]
-                        t = np.around(np.transpose(t, (0, 1, 2)) / 255, decimals=12)
+                        t = np.around(np.transpose(t, (0, 1, 2)) / 179.0, decimals=12)
                         t = np.array([t])
 
                         embedding_vector = model.predict_on_batch(t)
 
-                        face_dict = {'min': np.array([x_min, y_min]),
+                        face_dict = {'score_val': score_val,
+                                     'min': np.array([x_min, y_min]),
                                      'max': np.array([x_max, y_max]),
                                      'center': np.array([center_x, center_y]),
                                      'embedding_vector': embedding_vector}
 
                         face_list.append(face_dict)
-
-                        print(face_dict)
-
-                        k_means.append(face_dict)
 
                 if len(face_group) == 0:
                     for i in face_list:
@@ -162,63 +142,62 @@ with detection_graph.as_default():
 
                 else:
 
-                    face_info = []  # [ [ face와 group간 비교한 distance 결과] , [], [] ]
-                    for face_idx, face in enumerate(face_list):
+                    for face in face_list:
                         tmp_dis_group = []
-                        for group_idx, group in enumerate(face_group):
+                        for group in face_group:
                             dis = 0
                             for item in group:
+
                                 dis = dis + calc_vector_distance(item['embedding_vector'], face['embedding_vector'])
-                                #m_dis = calc_vector_distance(item['embedding_vector'], face['embedding_vector'])
+                                print("dis",calc_vector_distance(item['embedding_vector'], face['embedding_vector']))
 
                             m_dis = dis/len(group)
+                            print("mdis",m_dis)
+                            tmp_dis_group.append(m_dis)
+                        print('')
 
-                            tmp_dis_group.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis})
-                            face_info.append({'face_idx': face_idx, 'group_idx': group_idx, 'distance': m_dis,
-                                              'center': face['center'], 'min': face['min'], 'max': face['max'],
-                                              'embedding_vector': face['embedding_vector']})
 
-                    sort_face = sorted(face_info, key=lambda k: k['distance'])
+                        min_idx, min_value = get_min_idx(tmp_dis_group)
 
-                    group_check = max_value(sort_face, 'group_idx')
-                    face_check = max_value(sort_face, 'face_idx')
-                    color_list = [(255,0,0), (0,0,255), (0,255,0), (0,153,255)]
 
-                    # [{'face_idx': 0, 'group_idx': 0, 'distance': 0.45119333267211914},
-                    # {'face_idx': 1, 'group_idx': 1, 'distance': 0.751081109046936},
-                    # {'face_idx': 0, 'group_idx': 1, 'distance': 0.7820329666137695},
-                    # {'face_idx': 1, 'group_idx': 0, 'distance': 0.9556329846382141}]
-                    #print(sort_face)
-
-                    for item in sort_face:
-                        if (face_check[item['face_idx']] == False) and (group_check[item['group_idx']] == False):
-
-                            if item['distance'] < 1.5:
-
-                                cv2.circle(image, (item['center'][0], item['center'][1]), 10, color_list[item['group_idx']], -1)
-                                cv2.rectangle(image, tuple(item['min']), tuple(item['max']), color_list[item['group_idx']], 2)
-                                font = cv2.FONT_HERSHEY_SIMPLEX
-                                cv2.putText(image, "group_idx : " + str(item['group_idx']) + " / distance : " + str(item['distance']), tuple(item['max']), font, 0.5, color_list[item['group_idx']], 1, cv2.LINE_AA)
-
-                                face_check[item['face_idx']] = True
-                                group_check[item['group_idx']] = True
+                        if min_value < 0.9:
+                            if min_idx == 1:
+                                cv2.circle(image, (face['center'][0],face['center'][1]), 10, (0, 0, 255),-1)
+                                cv2.rectangle(image, tuple(face['min']), tuple(face['max']), (0, 0, 255), 2)
 
                             else:
-                                face_group.append([item])
+                                cv2.circle(image, (face['center'][0], face['center'][1]), 10, (255, 0, 0), -1)
+                                cv2.rectangle(image, tuple(face['min']), tuple(face['max']), (255, 0, 0), 2)
 
+                            face_group[min_idx].append(face)
+                        else:
+                            face_group.append([face])
+
+                    print('face_group',len(face_group))
+
+
+                # frame_list.append(face_list)
+                #
+                # # compare pre_frame and current_frame
+                # if frame_index != 0:
+                #     current_face_positions = np.array([item['center'] for item in frame_list[frame_index]])
+                #     pre_face_positions = np.array([item['center'] for item in frame_list[frame_index-1]])
+                #     result = calc_min_distance(pre_face_positions, current_face_positions)
+                #     print(result)
+                #
+                #     for item in result:
+                #         if item['match_index'][0] == 1:
+                #             cv2.circle(image, (current_face_positions[item['match_index'][1]][0], current_face_positions[item['match_index'][1]][1]), 10, (0, 0, 255), -1)
+                #         else:
+                #
+                #             cv2.circle(image, (current_face_positions[item['match_index'][1]][0],current_face_positions[item['match_index'][1]][1]), 10, (255, 0, 0),-1)
+                #
 
                 cv2.imshow('t', image)
-                out.write(image)
-                cv2.waitKey(1)
+                cv2.imwrite('blackpink_error.jpg',image)
+                cv2.waitKey(0)
 
                 frame_index = frame_index + 1
 
 
-            import kmeans_function
-            z = []
-            for f in k_means:
-                z.append(f['center'])
-            kmeans_function.show(np.array(z))
-
             cap.release()
-            out.release()

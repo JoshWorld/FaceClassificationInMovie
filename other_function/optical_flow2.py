@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-cap = cv2.VideoCapture('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\sinsegae2.mp4')
+cap = cv2.VideoCapture('C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_data\\sinsegae2.mp4')
 ret, frame1 = cap.read()
 prvs = cv2.cvtColor(frame1,cv2.COLOR_BGR2GRAY)
 hsv = np.zeros_like(frame1)

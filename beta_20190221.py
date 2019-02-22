@@ -15,32 +15,36 @@ def max_value(my_list, key):
     return [False for _ in range(max+1)]
 
 
+# 벡터간 거리 계산
 def calc_vector_distance(v1, v2):
     dist = np.linalg.norm(v1 - v2)
     return dist
 
 
+# Face Detection 을 위한 모델 및 라벨 불러오기
 PATH_TO_CKPT = 'models/face_detection_graph.pb'
 PATH_TO_LABELS = 'labels/face_label_map.pbtxt'
-
 NUM_CLASSES = 2
+label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
+categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
+category_index = label_map_util.create_category_index(categories)
 
+
+# Face Detection Rate, New Face Rate, embedding vector 거리 가중치, 좌표 거리 가중치 설정
 PERSON_DETECTION_RATE = 0.2
 NEW_FACE_RATE = 1.5
 E_DISTANCE_RATE = 0.999
 P_DISTANCE_RATE = 0.001
 
 
-label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-category_index = label_map_util.create_category_index(categories)
-
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_video\\blackpink01.mp4")
-
+# 샘플 영상 설정
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_data\\blackpink01.mp4")
 ret, frame = cap.read()
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output_apply_distance.mp4',fourcc, 20.0, (frame.shape[1],frame.shape[0]))
 
+
+# Face Detection Graph 설정
 detection_graph = tf.Graph()
 
 with detection_graph.as_default():
@@ -57,6 +61,8 @@ with detection_graph.as_default():
     config.gpu_options.allow_growth = True
 
     with tf.Session(graph=detection_graph, config=config) as sess:
+
+        # Face to Embedding Vector Model 설정
         with CustomObjectScope({'tf': tf}):
             model = load_model('models/nn4.small2.lrn.h5')
 
@@ -140,7 +146,6 @@ with detection_graph.as_default():
 
                             face_info.append(face_dict)
 
-
                     m = np.array([item['sum'] for item in face_info])
                     m = (m - np.mean(m)) / np.std(m)
                     for mean, f in zip(m, face_info):
@@ -178,8 +183,6 @@ with detection_graph.as_default():
                 cv2.waitKey(1)
 
                 frame_index = frame_index + 1
-
-
 
             cap.release()
             out.release()

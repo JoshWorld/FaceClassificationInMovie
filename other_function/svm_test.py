@@ -1,7 +1,6 @@
 import numpy as np
 import pickle
-from test_code import get_embedding_vector
-
+from other_function import get_embedding_vector
 
 f = open('../face_data.save','rb')
 a = pickle.load(f)
@@ -30,11 +29,11 @@ from sklearn.svm import SVC
 clf = SVC(gamma='auto')
 clf.fit(X, y)
 
-SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
-    decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
+SVC(C=1.0, cache_size=2000, class_weight=None, coef0=0.0,
+    decision_function_shape='ovr', degree=128, gamma='auto', kernel='rbf',
     max_iter=-1, probability=False, random_state=None, shrinking=True,
     tol=0.001, verbose=False)
 
-v = get_embedding_vector.get_embedding_vector_func('C:\\Users\\ADMIN\\Desktop\\FaceClassificationInMovie\\test_code\\test4.JPG')
+v = get_embedding_vector.get_embedding_vector_func('C:\\Users\\ADMIN\\Desktop\\FaceClassificationInMovie\\test_data/image\\test5.JPG')
 print(v)
 print(clf.predict([np.array(v).squeeze()]))
