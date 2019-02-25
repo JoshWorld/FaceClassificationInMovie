@@ -38,7 +38,7 @@ P_DISTANCE_RATE = 0.001
 
 
 # 샘플 영상 설정
-cap = cv2.VideoCapture("C:\\Users\\ADMIN\\PycharmProjects\\FaceClassificationInMovie\\test_data\\blackpink01.mp4")
+cap = cv2.VideoCapture("C:\\Users\\ADMIN\\Desktop\\FaceClassificationInMovie\\test_data\\video\\bts.mp4")
 ret, frame = cap.read()
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output_apply_distance.mp4',fourcc, 20.0, (frame.shape[1],frame.shape[0]))
@@ -155,7 +155,7 @@ with detection_graph.as_default():
 
                     group_check = max_value(sort_face, 'group_idx')
                     face_check = max_value(sort_face, 'face_idx')
-                    color_list = [(255, 0, 0), (0, 0, 255), (0, 255, 0), (0, 153, 255)]
+                    color_list = [(255, 0, 0), (0, 0, 255), (0, 255, 0), (0, 153, 255),(153,0,255),(255,255,255),(100,100,100),(50,50,50),(0,50,0),(0,0,50)]
 
                     for item in sort_face:
                         if (face_check[item['face_idx']] == False) and (group_check[item['group_idx']] == False):
