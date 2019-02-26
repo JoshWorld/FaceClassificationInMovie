@@ -117,6 +117,7 @@ with detection_graph.as_default():
                                      'max': np.array([x_max, y_max]),
                                      'center': np.array([center_x, center_y]),
                                      'embedding_vector': embedding_vector,
+                                     'image':crop_img
                                     }
 
                         # face_list 에 각 얼굴에 대한 최초 정보들이 모두 저장됨
@@ -142,7 +143,8 @@ with detection_graph.as_default():
 
                             face_dict = {'face_idx': face_idx, 'group_idx': group_idx,
                                          'e_distance': e_m_dis*E_DISTANCE_RATE, 'p_distance': p_m_dis*P_DISTANCE_RATE, 'sum': e_m_dis*E_DISTANCE_RATE + p_m_dis*P_DISTANCE_RATE,
-                                         'center': face['center'], 'min': face['min'], 'max': face['max'], 'embedding_vector': face['embedding_vector']}
+                                         'center': face['center'], 'min': face['min'], 'max': face['max'], 'embedding_vector': face['embedding_vector'],
+                                         'image':face['image']}
 
                             face_info.append(face_dict)
 
@@ -174,14 +176,15 @@ with detection_graph.as_default():
                             else:
                                 face_group.append([item])
 
-                with open('face_data.save', 'wb') as file:
-                    pickle.dump(face_group, file)
 
                 cv2.imshow('test', image)
                 out.write(image)
                 cv2.waitKey(1)
 
                 frame_index = frame_index + 1
+
+            with open('face_data_blackpink.data', 'wb') as file:
+                pickle.dump(face_group, file)
 
             cap.release()
             out.release()

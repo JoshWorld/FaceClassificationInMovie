@@ -1,4 +1,5 @@
-## FaceClassificationInMovie - 영화에서 다중 객체 중 특정 객체 얼굴 인식 및 분류
+## FaceClassificationInMovie
+#### 영화에서 다중 객체 중 특정 객체 얼굴 인식 및 분류
 #### Pre-Training Model을 이용하여 다중 객체 중 얼굴을 인식하여 자동으로 분류 한 후, 학습시킨 후 얼굴을 분류하는 프로젝트
 아래 논문과 오픈소스코드를 참고하였습니다.
 - Google Facenet 논문 (https://arxiv.org/abs/1503.03832)

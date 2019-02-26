@@ -13,5 +13,6 @@ model/
 *jpeg
 alpha_version/backup/
 alpha_version/model/
-.avi
-.mp4
+*.avi
+*.mp4
+*.data
