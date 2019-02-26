@@ -1,6 +1,5 @@
 
-# 분류되어진 학습데이터를 가지고 SVM 모델을 이용해 학습 후
-# 테스트 데이터 셋으로 해당 모델을 테스트 하는 모듈
+# SVM 학습 모듈
 
 import pickle
 import matplotlib.pyplot as plt

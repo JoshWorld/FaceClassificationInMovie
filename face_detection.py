@@ -1,7 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# pylint: disable=C0103
-# pylint: disable=E1101
+
+# 얼굴만 detection 하는 모듈
 
 import numpy as np
 import tensorflow as tf
@@ -74,23 +72,6 @@ with detection_graph.as_default():
                     c = c + 1
             cv2.imshow('t', image)
             cv2.waitKey(1)
-
-
-
-
-                    #
-                    # crop_img = image.copy()[y_min:y_max, x_min:x_max]
-                    #
-                    # t = cv2.resize(crop_img, (96, 96), interpolation=cv2.INTER_CUBIC)
-                    # t = t[..., ::-1]
-                    # t = np.around(np.transpose(t, (0, 1, 2)) / 255.0, decimals=12)
-                    # t = np.array([t])
-                    #
-                    # model.predict_on_batch(t)
-
-                    #cv2.imwrite('sinsegae2_face/frame{}.jpg'.format(c),crop_img)
-
-
 
         cap.release()
         #out.release()

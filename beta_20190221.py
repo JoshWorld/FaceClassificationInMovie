@@ -176,7 +176,6 @@ with detection_graph.as_default():
                             else:
                                 face_group.append([item])
 
-
                 cv2.imshow('test', image)
                 out.write(image)
                 cv2.waitKey(1)
