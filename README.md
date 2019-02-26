@@ -1,5 +1,4 @@
 ## FaceClassificationInMovie
-#### 영화에서 다중 객체 중 특정 객체 얼굴 인식 및 분류
 #### Pre-Training Model을 이용하여 다중 객체 중 얼굴을 인식하여 자동으로 분류 한 후, 학습시킨 후 얼굴을 분류하는 프로젝트
 아래 논문과 오픈소스코드를 참고하였습니다.
 - Google Facenet 논문 (https://arxiv.org/abs/1503.03832)
@@ -13,6 +12,9 @@
 3. Training Face (Using SVM)
 
 ## 결과
+![ezgif com-video-to-gif 1](https://user-images.githubusercontent.com/28443896/53380015-3a332080-39af-11e9-9c20-7f9cf9c1fd9f.gif)
+
+![ezgif com-video-to-gif 2](https://user-images.githubusercontent.com/28443896/53380242-102e2e00-39b0-11e9-88b9-eadc937fee4f.gif)
 
 ## 모듈 구성
 - backup : 작업하면서 만들었던 과거의 코드들
