@@ -4,7 +4,7 @@ import tensorflow as tf
 import cv2
 import numpy as np
 
-
+# image를 embedding vector로 바꾸어주는 함수
 def get_embedding_vector_func(image_path):
     with CustomObjectScope({'tf': tf}):
         model = load_model('models/nn4.small2.lrn.h5')
